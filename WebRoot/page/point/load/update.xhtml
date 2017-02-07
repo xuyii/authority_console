@@ -1,0 +1,83 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="知识点策略">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{pointReqAction.updateObj.pointListID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{pointListOther.pointListList}" var="p" itemLabel="#{p.pointListName}" itemValue="#{p.pointListID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="章节策略">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{pointReqAction.updateObj.chapterListID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mChapterID" listener="#{chapterOther.changeChapterListID2}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{chapterListOther.chapterListList}" var="c" itemLabel="#{c.chapterListName}" itemValue="#{c.chapterListID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="章节">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mChapterID" value="#{pointReqAction.updateObj.chapterID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{chapterOther.chapterList2}" var="c" itemLabel="#{c.chapterName}" itemValue="#{c.chapterID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="知识点名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{pointReqAction.updateObj.pointName}" id="pointName" style="width:200px;"/>
+
+	<h:outputLabel value="做题数量"/>
+	<p:inputText value="#{pointReqAction.updateObj.quesAnswerNum}" id="quesAnswerNum" styleClass="minLength"/>
+	<h:outputLabel value="做题正确率(%)"/>
+	<p:inputText value="#{pointReqAction.updateObj.quesCorrectRate}" styleClass="minLength">
+	</p:inputText>
+
+	<h:outputLabel value="知识点描述"/>
+	<p:inputText value="#{pointReqAction.updateObj.pointDescribe}" id="pointDescribe" style="width:200px;"/>
+
+	<h:outputLabel value="考频指数"/>
+	<p:selectOneMenu value="#{pointReqAction.updateObj.pointLevel}" id="pointLevel" style="width:200px;" panelStyleClass="minLength">
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{pointReqAction.pointLevels.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="自定义排序">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{pointReqAction.updateObj.sequence}" id="sequence" style="width:200px;"/>
+
+	<h:outputLabel value="选择书本"/>
+	<p:selectOneMenu value="#{pointReqAction.updateObj.bookID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mBookChapterID" listener="#{chapterOther.changeBookID}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{bookOther.bookList}" var="b" itemLabel="#{b.bookName}" itemValue="#{b.bookID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="书本章节"/>
+	<p:selectOneMenu id="mBookChapterID" value="#{pointReqAction.updateObj.bookChapterID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{chapterOther.chapterList4Book}" var="c" itemLabel="#{c.chapterName}" itemValue="#{c.chapterID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="书本页"/>
+	<p:inputText value="#{pointReqAction.updateObj.pageNum}" id="pageNum" style="width:200px;"/>
+
+	<h:outputLabel value="近三年考试题型"/>
+	<p:inputText value="#{pointReqAction.updateObj.typeList}" id="typeList" style="width:200px;"/>
+
+	<h:outputLabel value="近三年考试平均分值"/>
+	<p:inputText value="#{pointReqAction.updateObj.score}" id="score" style="width:200px;"/>
+
+	<h:outputLabel value="命题思路"/>
+	<p:inputText value="#{pointReqAction.updateObj.thought}" id="thought" style="width:200px;"/>
+
+	<h:outputLabel value="学习提示"/>
+	<p:inputText value="#{pointReqAction.updateObj.remind}" id="remind" style="width:200px;"/>
+
+</p:panelGrid>

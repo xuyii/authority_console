@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+
+	<sql id="find_body">
+		SELECT 
+			DISTINCT a.adminID, a.adminName, a.realName, a.cellPhone, a.status,
+			a.createTime, a.adminName creatorName, a.email, a.tel
+		FROM 
+			RAD_ADMIN_USER a, RAD_ADMIN_USER_ROLE c
+		WHERE
+			a.adminID=c.adminID AND a.adminID &gt; 0
+			<if test="adminName !=null and adminName !=''"> and a.adminName = #{adminName} </if>
+			<if test="realName !=null and realName !=''"> and a.realName = #{realName} </if>
+			<if test="status !=null"> and a.status = #{status} </if>
+			<if test="cellPhone !=null and cellPhone !=''"> and a.cellPhone = #{cellPhone} </if>
+			<if test="roleID !=null and roleID !=''"> and c.roleID = #{roleID} </if>
+	</sql>
+	<select id="countUser" resultType="int">
+		SELECT count(*) FROM (		
+			<include refid="find_body" />
+		) AS myTable 
+	</select>
+	<select id="findPageUser" resultType="User" parameterType="User">
+		SELECT * FROM (		
+			<include refid="find_body" />
+		) AS myTable LIMIT #{rowNumStart}, #{rowNumEnd}
+	</select>
+
+	<update id="updateUser" parameterType="User">
+		UPDATE RAD_ADMIN_USER
+		<set>
+			<if test="realName !=null and realName != ''"> realName = #{realName},</if>
+			<if test="displayName !=null and displayName != ''"> displayName = #{displayName},</if>
+			<if test="cellPhone !=null and cellPhone != ''"> cellPhone = #{cellPhone},</if>
+			<if test="passWd !=null and passWd != ''"> passWd = #{passWd},</if>
+			<if test="pwdModifyTime !=null"> pwdModifyTime = #{pwdModifyTime},</if>
+			<if test="status !=null"> status = #{status},</if>
+			<if test="email !=null and email != ''"> email=#{email} </if>
+		</set>
+		where adminID=#{adminID}
+	</update>
+
+	<select id="getUser" parameterType="Integer" resultType="User">
+		SELECT adminID,adminName,realName,displayName,cellPhone,lastLogin,
+			loginIP,email,tel
+		FROM RAD_ADMIN_USER WHERE adminID=#{adminID}
+	</select>
+
+	<select id="hasSameUserName" parameterType="User" resultType="Integer">
+		SELECT count(adminID)
+		FROM RAD_ADMIN_USER where adminName=#{adminName}
+		<if test="adminID !=null"> and adminID != #{adminID} </if>
+	</select>
+
+	<insert id="insertUser">
+		INSERT INTO RAD_ADMIN_USER (
+			adminName, passwd, cellphone,lastLogin,pwdModifyTime,loginIP,status,creator,createTime
+			<trim prefix="" suffixOverrides=",">
+            	<if test="realName != null and realName != ''"> ,realName </if>
+            	<if test="displayName != null and displayName != ''"> ,displayName </if>
+            	<if test="email !=null and email != ''"> ,email </if>
+            </trim>
+		)
+		VALUES(
+			#{adminName}, #{passWd}, #{cellPhone}, #{lastLogin}, #{pwdModifyTime}, #{loginIP}, #{status}, #{creator},#{createTime}
+			<trim prefix="" suffixOverrides=",">
+            	<if test="realName != null and realName != ''"> ,#{realName} </if>
+            	<if test="displayName != null and displayName != ''"> ,#{displayName} </if>
+            	<if test="email !=null and email != ''"> ,#{email} </if>
+			</trim>
+		)
+		<selectKey resultType="int" keyProperty="adminID" >
+            SELECT @@IDENTITY AS adminID
+        </selectKey>
+	</insert>
+
+	<resultMap type="java.util.HashMap" id="resultMap">
+		<result column="tableName" property="tableName" javaType="java.lang.Integer" jdbcType="VARCHAR"/>
+	</resultMap>
+    <select id="getNewID" statementType="CALLABLE" parameterType="java.util.HashMap" resultMap="resultMap">
+		<![CDATA[
+			{ #{adminID, mode=OUT, jdbcType=INTEGER} = call GetIDGen(#{tableName, mode=IN, jdbcType=VARCHAR}) }
+		]]>
+    </select>
+
+    <select id="getUserList4I" parameterType="Integer" resultType="User">
+		SELECT adminID,adminName
+		FROM RAD_ADMIN_USER WHERE adminID &gt; 0
+	</select>
+
+</mapper>

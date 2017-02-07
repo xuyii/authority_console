@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>组织管理</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:tree id="tree" value="#{teacherOrgAction.root}" var="doc" selectionMode="single" >
+	        <p:ajax event="select" listener="#{teacherOrgAction.onNodeSelect}" 
+	        	oncomplete="showDialog.show();" update=":showForm:showDialog"/>
+	 
+	        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+	            <h:outputText value="#{doc.name}"/>
+	        </p:treeNode>
+	    </p:tree>
+	</p:panel>
+	</h:form>
+	
+	<h:form id="showForm" >
+		<p:dialog id="showDialog" header="节点信息" widgetVar="showDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/show.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<p:commandButton value="添加子节点" actionListener="#{teacherOrgReqAction.add}" oncomplete="loadDialog.show();" update=":loadForm:loadDialog"/>
+					<p:spacer width="5" />
+					<p:commandButton value="修改" actionListener="#{teacherOrgReqAction.update}" oncomplete="loadDialog.show();" update=":loadForm:loadDialog"/>
+					<p:spacer width="5" />
+					<p:commandButton value="删除" onstart="return confirmDel();" actionListener="#{teacherOrgReqAction.deleteSubmit}" update="msg" oncomplete="optResult('showDialog',args,'2');" rendered="#{teacherOrgAction.canDelete}"/>
+					<p:spacer width="5" />
+					<p:commandButton type="button" value="关闭" onclick="showDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="#{(teacherOrgReqAction.flag==0)?'添加':'修改'}" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200" modal="true">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{teacherOrgReqAction.flag}"/>
+					<h:inputHidden value="#{teacherOrgReqAction.updateObj.orgID}"/>
+					<h:inputHidden value="#{teacherOrgReqAction.updateObj.parentID}"/>
+					<h:inputHidden value="#{teacherOrgReqAction.updateObj.level}"/>
+					<p:commandButton value="#{(teacherOrgReqAction.flag==0)?'添加':'修改'}" actionListener="#{teacherOrgReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{teacherOrgReqAction.flag}');showDialog.hide();"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

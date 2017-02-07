@@ -1,0 +1,45 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="书本名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{bookReqAction.updateObj.bookName}" styleClass="minLength"/>
+
+	<h:outputLabel value="书本链接"/>
+	<p:inputText value="#{bookReqAction.updateObj.httpLink}" styleClass="minLength"/>
+
+	<h:outputLabel value="分页名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{bookReqAction.updateObj.pageSubject}" styleClass="minLength"/>
+
+	<h:outputLabel value="题号名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{bookReqAction.updateObj.quesSubject}" styleClass="minLength"/>
+
+	<h:outputLabel value="章节策略">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="uChapterListID" value="#{bookReqAction.updateObj.chapterListID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{bookAction.chapterList}" var="c" itemLabel="#{c.chapterListName}" itemValue="#{c.chapterListID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="知识点策略">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="uPointListID" value="#{bookReqAction.updateObj.pointListID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{bookAction.pointList}" var="p" itemLabel="#{p.pointListName}" itemValue="#{p.pointListID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="使用的课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectCheckboxMenu id="uCourseIDs" value="#{bookReqAction.courseIDs}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{courseOther.courseList2}" var="c" itemLabel="#{c.courseName}" itemValue="#{c.courseID}"/>
+	</p:selectCheckboxMenu>
+
+</p:panelGrid>

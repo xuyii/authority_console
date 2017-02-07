@@ -1,0 +1,18 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="网站名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{businessReqAction.updateObj.siteID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="专业名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{businessReqAction.updateObj.businessName}" styleClass="minLength"/>
+
+</p:panelGrid>

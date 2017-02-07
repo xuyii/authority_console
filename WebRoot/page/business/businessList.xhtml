@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>专业管理</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			
+			<h:outputLabel value="所属网站" />
+			<p:selectOneMenu id="sSiteID" value="#{businessAction.search.siteID}" style="width:200px;" panelStyleClass="minLength" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="专业名" />
+			<p:inputText value="#{businessAction.search.businessName}" styleClass="minLength"/>
+			
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{businessAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{businessReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{businessAction.search}" rendered="#{businessAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="loadDialog.show();" 
+				actionListener="#{businessReqAction.add}" rendered="#{businessAction.optAuth}" update=":loadForm:loadDialog" />
+		</p:menubar>
+		
+		<p:dataTable scrollable="true" scrollHeight="#{businessAction.heighti2}" 
+			widgetVar="table"
+			id="list"
+			binding="#{businessAction.pageTable}"
+			lazy="true"
+			value="#{businessAction.page}" 
+			rows="20"
+			var="business" 
+			paginator="true" 
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable" 
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{businessAction.viewAuth}"
+			>
+			<p:column headerText="网站" width="20%">
+				<h:outputText value="#{business.siteName}" />
+			</p:column>
+			<p:column headerText="专业ID" width="20%">
+				<h:outputText value="#{business.businessID}" />
+			</p:column>
+			<p:column headerText="专业名" width="20%">
+				<h:outputText value="#{business.businessName}" />
+			</p:column>
+			<p:column headerText="操作" width="20%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{businessReqAction.update(business.businessID)}" update=":loadForm:loadDialog" rendered="#{businessAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="20%">
+				<p:commandLink id="tStatus" value="#{business.statusStr}" update=":info tStatus" actionListener="#{businessReqAction.changeStatus(business.businessID,business.status)}" rendered="#{businessAction.optAuth}"/>
+				<h:outputText value="#{business.statusStr}" rendered="#{!businessAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	
+	<!-- 添加/修改页面 -->
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="#{(businessReqAction.flag==0)?'添加':'修改'}" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{businessReqAction.flag}"/>
+					<h:inputHidden value="#{businessReqAction.updateObj.businessID}"/>
+					<p:commandButton value="#{businessReqAction.flag==0?'添加':'修改'}" actionListener="#{businessReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{businessReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

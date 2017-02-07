@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="role">
+
+	<sql id="find_body">
+		select 
+			roleID, roleName, roleCategory, creator, createTime
+		from 
+			RAD_ADMIN_ROLE 
+		<where>
+			<if test="roleName !=null and roleName !=''"> and roleName = #{roleName} </if>
+			<if test="roleCategory !=null and roleCategory !=''"> and roleCategory = #{roleCategory} </if>
+		</where>
+	</sql>
+	<select id="countRole" resultType="int">
+		SELECT COUNT(*) FROM (
+			<include refid="find_body" />
+		) AS myTable
+	</select>
+	<select id="findPageRole" resultType="Role" parameterType="Role">
+		SELECT * FROM (
+			<include refid="find_body" />
+		) AS myTable LIMIT #{rowNumStart}, #{rowNumEnd}
+	</select>
+
+	<select id="getRole" resultType="Role">
+		SELECT roleID,roleName,roleCategory
+		FROM RAD_ADMIN_ROLE  WHERE roleID=#{roleID}
+    </select>
+
+    <update id="updateRole">
+		UPDATE RAD_ADMIN_ROLE set roleName=#{roleName},roleCategory=#{roleCategory}
+		WHERE roleID=#{roleID}
+    </update>
+
+    <insert id="insertRole">
+		INSERT INTO RAD_ADMIN_ROLE (roleName, roleCategory, creator, createTime)
+		VALUES(#{roleName}, #{roleCategory}, #{creator}, #{createTime})
+    </insert>
+
+    <select id="getRoleList4I" resultType="Role">
+		SELECT roleID,roleName ,roleCategory
+		FROM RAD_ADMIN_ROLE 
+    </select>
+
+</mapper>

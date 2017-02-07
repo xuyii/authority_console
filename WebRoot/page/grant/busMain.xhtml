@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>系统管理后台</title>
+	<h:outputStylesheet library="css" name="main.css" />
+	<style>
+	BODY {
+		MARGIN: 0px;
+		padding: 0px;
+		FONT-SIZE: 12px;
+		FONT-FAMILY: verdana, Geneva, Arial, Helvetica, sans-serif;
+	}
+	.ui-widget {
+		font-size: 100%;
+	}
+	.navPoint {
+		COLOR: black;
+		CURSOR: hand;
+		FONT-FAMILY: Webdings;
+		FONT-SIZE: 9pt;
+	}
+	.ui-layout-unit .ui-layout-unit-content {
+		overflow: hidden;
+	}
+	.requiredFlag {
+		color: red;
+	}
+	</style>
+	<script>
+	function loadTabPage(){
+		var currentNodeType=jQuery("#formHidden\\:currentNodeType").val();
+		if(currentNodeType=="leaf"){
+			window.iframeTab.addTab(jQuery("#formHidden\\:currentNodeUrl").val(),jQuery("#formHidden\\:currentNodeName").val(),jQuery("#formHidden\\:siteID").val(),jQuery("#formHidden\\:businessID").val(),jQuery("#formHidden\\:majorID").val(),jQuery("#formHidden\\:courseID").val());
+		}
+	}
+	function loadTabPage2(currentNodeUrl,currentNodeName){
+		jQuery("#formHidden\\:currentNodeUrl").val(currentNodeUrl);
+		jQuery("#formHidden\\:currentNodeName").val(currentNodeName);
+		window.iframeTab.addTab(currentNodeUrl,currentNodeName,jQuery("#formHidden\\:siteID").val(),jQuery("#formHidden\\:businessID").val(),jQuery("#formHidden\\:majorID").val(),jQuery("#formHidden\\:courseID").val());
+	}
+	
+	function optResult2(dialogName, args, callBackFunction) {
+		var show = 0;
+		if (args == null || args == "undefined") {
+			show = 0;
+		} else {
+			show = args.result;
+		}
+		var str;
+		if (show == 1) {
+			location.reload();
+			str = dialogName + ".hide()";
+		} else {
+			if (show == -1) {
+				alert("数据有误，操作失败！");
+			}
+			str = dialogName + ".show()";
+		}
+		if (show == 1) {
+			closeTab();
+			changeCourseDialog.hide();
+			$("#formHidden\\:menuBtn").css("display","");
+		}
+	}
+	//获取所有可关闭的选项卡
+	function  closeTab(){
+		$(window.frames["iframeTab"].document).find("#tabs").find("ul li").find("a").each(function(i){
+			var  href = $(this).attr("href");
+			var  action = href.split("-")[2];
+			if(action != 0){
+				window.iframeTab.closeMe(action);
+			}
+		});
+	}
+	</script>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+
+	<p:layout fullPage="true">
+		<p:layoutUnit position="north" size="35" style="padding:0px; margin:0px; " >
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#37d1f7">
+				<tr>
+			        <td>
+						<h:form id="formHidden">
+							<p:commandButton id="menuBtn" value="显示菜单" type="button" />
+							<h:inputHidden id="currentNodeType" value="#{leftTreeAction.currentNodeType }" />
+							<h:inputHidden id="currentNodeName" value="#{leftTreeAction.currentNodeName }" />
+							<h:inputHidden id="currentNodeUrl" value="#{leftTreeAction.currentNodeUrl }" />
+							<h:inputHidden id="tabMax" value="#{leftTreeAction.tabMax }" />
+							<p:tieredMenu model="#{leftTreeAction.model}" overlay="true" trigger="menuBtn" my="left top" at="left bottom" />
+							<p:spacer width="20"/>
+			        		<h:graphicImage url="/resources/images/index_09.gif" height="16" width="15"/>
+				           	<strong style="color:#ffffff; "><b style="color:#ffffff; ">&nbsp;您好，</b><b style="color:#ffffff; "><p:commandLink value="${com_chnedu_plat_grant_admin_real_name}" update=":formHidden:currentNodeType :formHidden:currentNodeName :formHidden:currentNodeUrl :formHidden:tabMax"
+				            	actionListener="#{leftTreeAction.openPage('adminUser','个人中心')}" oncomplete="loadTabPage();" style="color:#ffffff; "/></b>！</strong>
+						</h:form>
+			        </td>
+			        <td align="left">
+						<h:form id="formLogout">
+				            <p:commandLink action="#{loginAction.logout }" value="[退出]" style="color:#ffffff; "/>
+				            <p:spacer width="10"/>
+				            <p:commandLink value="[个人中心]" update=":formHidden:currentNodeType :formHidden:currentNodeName :formHidden:currentNodeUrl :formHidden:tabMax"
+				            	actionListener="#{leftTreeAction.openPage('adminUser','个人中心')}" oncomplete="loadTabPage();" style="color:#ffffff; "/>
+				            <p:spacer width="10"/>
+				            <p:outputLabel value="更换皮肤" style="color:#ffffff; "/>
+							<p:themeSwitcher value="#{sessionManager.theme}" style="width:220px; text-align:left;" var="t">
+								<f:selectItems value="#{sessionManager.themes}" var="theme" itemLabel="Theme: #{theme.displayName}" itemValue="#{theme}"/>
+                                <p:column>
+                                    <p:graphicImage value="#{t.image}"/>
+                                </p:column>
+                                <p:column>
+                                    #{t.displayName}
+                                </p:column>
+                                <p:ajax listener="#{sessionManager.saveTheme}" update=":info"/>
+							</p:themeSwitcher>
+							<p:spacer width="10"/>
+						</h:form>
+					</td>
+				</tr>
+			</table>
+		</p:layoutUnit>
+		<p:layoutUnit position="center" style="padding:0px; margin:0px; ">
+			<f:verbatim>
+				<iframe frameborder="0" id="iframeTab" name="iframeTab" src="iframeTab.xhtml" width="100%" height="100%" scrolling="no" />
+			</f:verbatim>
+		</p:layoutUnit>
+	</p:layout>
+
+	<f:verbatim>
+		<iframe src="keepSession.xhtml" style="display:none; "/>
+	</f:verbatim>
+
+</h:body>
+</html>

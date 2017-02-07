@@ -1,0 +1,20 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="课程名称"/>
+	<h:outputText value="#{examReqAction.updateObj.courseName}" />
+
+	<h:outputLabel value="开始时间">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:calendar value="#{examReqAction.updateObj.startTime}" pattern="yyyy-MM-dd" readonlyInput="true" showButtonPanel="true" navigator="true" size="35"></p:calendar>
+
+	<h:outputLabel value="结束时间">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:calendar value="#{examReqAction.updateObj.endTime}" pattern="yyyy-MM-dd" readonlyInput="true" showButtonPanel="true" navigator="true" size="35"></p:calendar>
+
+	<h:inputHidden value="#{examReqAction.updateObj.id}"/>
+</p:panelGrid>

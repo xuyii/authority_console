@@ -1,0 +1,26 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="章节策略">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{chapterReqAction.updateObj.chapterListID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{chapterListOther.chapterListList}" var="cl" itemLabel="#{cl.chapterListName}" itemValue="#{cl.chapterListID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="章节名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterReqAction.updateObj.chapterName}" id="chapterName" styleClass="minLength"/>
+	<h:outputLabel value="对外章节(专业共建平台对外章节号)" >
+		<span class="requiredFlag"></span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterReqAction.updateObj.outChapterID}" id="outChapterID" styleClass="minLength" title="提示：专业共建平台对外章节号"/>
+	<h:outputLabel value="顺序号">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterReqAction.updateObj.sequence}" id="sequence" styleClass="minLength"/>
+
+</p:panelGrid>

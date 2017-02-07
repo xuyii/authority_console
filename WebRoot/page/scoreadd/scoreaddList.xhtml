@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>录入成绩</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			<h:outputLabel value="班级" />
+			<p:selectOneMenu value="#{scoreaddAction.search.adminID}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{scoreaddOther.scoreaddList}" var="courseClass" itemLabel="#{courseClass.courseClassName}" itemValue="#{courseClass.courseClassID}"/>
+			</p:selectOneMenu>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{scoreaddAction.search}" rendered="#{scoreaddAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+	</p:panel>
+	</h:form>
+	<!-- 添加/修改页面 -->
+	
+</h:body>
+</html>

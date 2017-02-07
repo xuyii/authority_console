@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>角色管理</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+
+			<h:outputLabel value="用户名" />
+			<p:inputText value="#{userAction.search.adminName}" styleClass="minLength"/>
+
+			<h:outputLabel value="真实姓名" />
+			<p:inputText value="#{userAction.search.realName}" styleClass="minLength"/>
+
+			<h:outputLabel value="电话" />
+			<p:inputText value="#{userAction.search.cellPhone}" styleClass="minLength"/>
+
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{userAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{userReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel value="所属角色" />
+			<p:selectOneMenu value="#{userAction.search.roleID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+				<f:selectItem itemLabel="--请选择角色--" itemValue="" />
+				<f:selectItems value="#{roleOther.roleList}" var="role" itemLabel="#{role.roleCategoryAndRoleName}" itemValue="#{role.roleID}"/>
+			</p:selectOneMenu>
+
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{userAction.search}" rendered="#{userAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>
+		</p:panelGrid>
+		</p:fieldset>
+
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="addDialog.show();"
+				actionListener="#{userReqAction.add}" rendered="#{userAction.optAuth}" update=":addForm:addDialog" />
+		</p:menubar>
+
+		<p:dataTable scrollable="true" scrollHeight="#{userAction.heighti2}"
+			widgetVar="table"
+			id="list"
+			binding="#{userAction.pageTable}"
+			lazy="true"
+			value="#{userAction.page}"
+			rows="20"
+			var="user"
+			paginator="true"
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable"
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{userAction.viewAuth}"
+			>
+			<p:column headerText="用户名" width="15%" >
+				<h:outputText value="#{user.adminName}" />
+			</p:column>
+			<p:column headerText="真实姓名" width="20%">
+				<h:outputText value="#{user.realName}" />
+			</p:column>
+			<p:column headerText="电话" width="15%">
+				<h:outputText value="#{user.cellPhone}" />
+			</p:column>
+			<p:column headerText="创建人" width="15%">
+				<h:outputText value="#{user.creatorName}" />
+			</p:column>
+			<p:column headerText="创建时间" width="15%">
+				<h:outputText value="#{user.createTimeStr}" />
+			</p:column>
+			<p:column headerText="操作" width="20%">
+				<p:commandLink value="修改密码" oncomplete="pwDialog.show();" actionListener="#{userReqAction.changePw(user.adminID)}" update=":pwForm:pwDialog" rendered="#{userAction.optAuth}"/>
+				<p:spacer width="5"/>
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{userReqAction.update(user.adminID)}" update=":loadForm:loadDialog" rendered="#{userAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="10%">
+				<p:commandLink id="tStatus" value="#{user.statusStr}" update=":info tStatus" actionListener="#{userReqAction.changeStatus(user.adminID,user.status)}" rendered="#{userAction.optAuth}"/>
+				<h:outputText value="#{user.statusStr}" rendered="#{!userAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+
+	<h:form id="pwForm" >
+		<p:dialog id="pwDialog" header="修改密码" widgetVar="pwDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/changePw.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{userReqAction.flag}"/>
+					<h:inputHidden value="#{userReqAction.updateObj.adminID}"/>
+					<p:commandButton value="修改" actionListener="#{userReqAction.updateSubmit}" update="msg" oncomplete="optResult('pwDialog',args,'#{userReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="pwDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<!-- 添加/修改页面 -->
+	<h:form id="addForm" >
+		<p:dialog id="addDialog" header="添加" widgetVar="addDialog" resizable="false" showEffect="fade" hideEffect="fade" height="400">
+			<ui:include src="load/add.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{userReqAction.flag}"/>
+					<p:commandButton value="添加" actionListener="#{userReqAction.updateSubmit}" update="msg" oncomplete="optResult('addDialog',args,'#{userReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="addDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="400">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{userReqAction.flag}"/>
+					<h:inputHidden value="#{userReqAction.updateObj.adminID}"/>
+					<p:commandButton value="修改" actionListener="#{userReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{userReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+
+</h:body>
+</html>

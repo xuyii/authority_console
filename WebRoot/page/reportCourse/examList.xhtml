@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>课程考期设置</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet" rendered="false">
+		<h:inputHidden value="#{examAction.courseID}" />
+		<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{examAction.search}" rendered="#{examAction.viewAuth}"/>
+		</p:fieldset>
+
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="addDialog.show();"
+				actionListener="#{examReqAction.add}" rendered="#{examAction.optAuth}" update=":addForm:addDialog" />
+		</p:menubar>
+
+		<p:dataTable scrollable="true" scrollHeight="#{examAction.heighti2}"
+			widgetVar="table"
+			id="list"
+			binding="#{examAction.pageTable}"
+			lazy="true"
+			value="#{examAction.page}"
+			rows="20"
+			var="examList"
+			paginator="true"
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable"
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{examAction.viewAuth}"
+			>
+			<p:column headerText="课程名称" width="20%">
+				<h:outputText value="#{examList.courseName}" />
+			</p:column>
+			<p:column headerText="考期开始时间" width="10%">
+				<h:outputText value="#{examList.startTimeStr}" />
+			</p:column>
+			<p:column headerText="考期结束时间" width="10%">
+				<h:outputText value="#{examList.endTimeStr}" />
+			</p:column>
+			<p:column headerText="当前有效考期" width="10%">
+				<h:outputText value="#{examList.isCurrentExamStr}" />
+			</p:column>
+			<p:column headerText="修改人" width="15%">
+				<h:outputText value="#{examList.realName}" />
+			</p:column>
+			<p:column headerText="修改时间" width="10%">
+				<h:outputText value="#{examList.modifyTime}">
+					<f:convertDateTime pattern="yyyy-MM-dd" />
+				</h:outputText>
+			</p:column>
+
+			<p:column headerText="操作" width="10%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{examReqAction.update(examList.id)}" update=":loadForm:loadDialog" rendered="#{examAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+
+	<h:form id="addForm" >
+		<p:dialog id="addDialog" header="添加考期" widgetVar="addDialog" resizable="false" showEffect="fade" hideEffect="fade" height="250">
+			<ui:include src="load/examAdd.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{examReqAction.flag}"/>
+					<p:commandButton value="添加" actionListener="#{examReqAction.updateSubmit}" update="msg" oncomplete="optResult('addDialog',args,'#{examReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="addDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改考期" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/examUpdate.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{examReqAction.flag}" />
+					<p:commandButton value="修改" actionListener="#{examReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{examReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+
+</h:body>
+</html>

@@ -1,0 +1,49 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="对外课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{siteCourseReqAction.updateObj.siteCourseName}" styleClass="minLength"/>
+
+	<h:outputLabel value="排序">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{siteCourseReqAction.updateObj.sequence}" styleClass="minLength"/>
+
+	<h:outputLabel value="服务类别">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{siteCourseReqAction.updateObj.serverType}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{siteCourseReqAction.serverTypes.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="自助试卷">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneRadio value="#{siteCourseReqAction.updateObj.helpPaperStatus}" >
+		<f:selectItems value="#{siteCourseReqAction.helpPaperStatuss.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneRadio>
+
+	<h:outputLabel value="高频考点"/>
+	<p:selectOneRadio value="#{siteCourseReqAction.updateObj.gaopinStatus}" >
+		<f:selectItems value="#{siteCourseReqAction.gaopinStatuss.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneRadio>
+
+	<h:outputLabel value="薄弱知识点"/>
+	<p:selectOneRadio value="#{siteCourseReqAction.updateObj.masterStatus}" >
+		<f:selectItems value="#{siteCourseReqAction.masterStatuss.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneRadio>
+
+	<h:outputLabel value="易见问题"/>
+	<p:selectOneRadio value="#{siteCourseReqAction.updateObj.commonQuesStatus}" >
+		<f:selectItems value="#{siteCourseReqAction.commonQuesStatuss.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneRadio>
+
+	<h:outputLabel value="随机练习"/>
+	<p:selectOneRadio value="#{siteCourseReqAction.updateObj.exerciseStatus}" >
+		<f:selectItems value="#{siteCourseReqAction.exerciseStatuss.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+	</p:selectOneRadio>
+</p:panelGrid>

@@ -1,0 +1,33 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" id="updatePanelGrid" styleClass="largeLength">
+
+	<c:forEach items="#{pointReqAction.relPointList}" varStatus="status" var="relp">
+		<p:row>
+			<p:column style="text-align:center;" colspan="4">
+				<h:outputText value="#{relp.key.chapterName}" style="font-weight: bold;" />
+			</p:column>
+		</p:row>
+		<p:row>
+			<p:column style="text-align:center;" colspan="4">
+				<p:panelGrid>
+					<c:forEach items="#{relp.value}" varStatus="status2" step="2" var="p">
+						<p:row>
+							<c:forEach items="#{relp.value}" var="p2" begin="#{status2.index}" end="#{status2.index+1}">
+								<p:column style="text-align:left; width:48%;">
+									<p:selectBooleanCheckbox value="#{p2.isChecked}" styleClass="relPoint #{p2.pointID}"/>
+									<p:spacer width="5"/>
+									<h:outputText value="#{p2.pointName}"/>
+								</p:column>
+							</c:forEach>
+						</p:row>
+					</c:forEach>
+				</p:panelGrid>
+			</p:column>
+		</p:row>
+	</c:forEach>
+	
+</p:panelGrid>

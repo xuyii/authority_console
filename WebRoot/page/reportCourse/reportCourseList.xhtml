@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>课程考期设置</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+
+			<h:outputLabel value="所属网站" />
+			<p:selectOneMenu id="sSiteID" value="#{reportCourseAction.search.siteID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sBusinessID sMajorID" listener="#{businessOther.changeSiteID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel value="所属专业" />
+			<p:selectOneMenu id="sBusinessID" value="#{reportCourseAction.search.businessID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sMajorID" listener="#{majorOther.changeBusinessID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{businessOther.businessList}" var="b" itemLabel="#{b.businessName}" itemValue="#{b.businessID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel value="所属辅导" />
+			<p:selectOneMenu id="sMajorID" value="#{reportCourseAction.search.majorID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{majorOther.majorList}" var="m" itemLabel="#{m.majorName}" itemValue="#{m.majorID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel value="课程名称" />
+			<p:inputText value="#{reportCourseAction.search.courseName}" styleClass="minLength"/>
+
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{reportCourseAction.search}" rendered="#{reportCourseAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>
+		</p:panelGrid>
+		</p:fieldset>
+
+		<p:dataTable scrollable="true" scrollHeight="#{reportCourseAction.heighti2}"
+			widgetVar="table"
+			id="list"
+			binding="#{reportCourseAction.pageTable}"
+			lazy="true"
+			value="#{reportCourseAction.page}"
+			rows="20"
+			var="courseList"
+			paginator="true"
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable"
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{reportCourseAction.viewAuth}"
+			editable="true"
+			editMode="cell"
+			>
+			<p:column headerText="辅导名称" width="15%">
+				<h:outputText value="#{courseList.majorName}" />
+			</p:column>
+			<p:column headerText="课程名称" width="20%">
+				<h:outputText value="#{courseList.courseName}" />
+			</p:column>
+			<p:column headerText="有效考期开始时间" width="15%">
+				<h:outputText value="#{courseList.startTimeStr}" />
+			</p:column>
+			<p:column headerText="有效考期结束时间" width="15%">
+				<h:outputText value="#{courseList.endTimeStr}" />
+			</p:column>
+			<p:column headerText="修改人" width="15%">
+				<h:outputText value="#{courseList.realName}" />
+			</p:column>
+			<p:column headerText="修改时间" width="10%">
+				<h:outputText value="#{courseList.modifyTimeStr}" />
+			</p:column>
+
+			<p:column headerText="操作" width="10%">
+				<h:link value="查看" rendered="#{reportCourseAction.optAuth}"
+					outcome="/page/reportCourse/examList" includeViewParams="true" target="_blank">
+					<f:param name="courseID" value="#{courseList.courseID}"/>
+				</h:link>
+				<p:spacer width="10px"/>
+				<p:commandLink value="设置有效考期" oncomplete="loadDialog.show();" actionListener="#{reportCourseReqAction.update(courseList.courseID)}" update=":loadForm:loadDialog" rendered="#{reportCourseAction.optAuth}"/>
+			</p:column>
+
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="设置有效考期" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<p:commandButton value="修改" actionListener="#{reportCourseReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{reportCourseReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+
+</h:body>
+</html>

@@ -1,0 +1,36 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="所属网站">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mSiteID" value="#{majorReqAction.updateObj.siteID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mBusinessID" listener="#{businessOther.changeSiteID2}" />
+		<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="所属专业">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mBusinessID" value="#{majorReqAction.updateObj.businessID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{businessOther.businessList2}" var="b" itemLabel="#{b.businessName}" itemValue="#{b.businessID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="辅导名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{majorReqAction.updateObj.majorName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="简称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{majorReqAction.updateObj.shortName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="顺序号">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{majorReqAction.updateObj.sequence}" styleClass="minLength"/>
+
+</p:panelGrid>

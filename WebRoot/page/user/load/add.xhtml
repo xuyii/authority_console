@@ -1,0 +1,44 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="用户名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{userReqAction.updateObj.adminName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="密码">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:password value="#{userReqAction.updateObj.newPassWd}" styleClass="minLength"/>
+	
+	<h:outputLabel value="确认密码">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:password value="#{userReqAction.updateObj.conNewPassWd}" styleClass="minLength"/>
+	
+	<h:outputLabel value="真实姓名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{userReqAction.updateObj.realName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="称呼"/>
+	<p:inputText value="#{userReqAction.updateObj.displayName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="电话">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{userReqAction.updateObj.cellPhone}" styleClass="minLength"/>
+	
+	<h:outputLabel value="邮箱"/>
+	<p:inputText value="#{userReqAction.updateObj.email}" styleClass="minLength"/>
+	
+	<h:outputLabel value="所属角色">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectCheckboxMenu value="#{userReqAction.roleIDs}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+		<f:selectItems value="#{roleOther.roleList}" var="role" itemLabel="#{role.roleCategoryAndRoleName}" itemValue="#{role.roleID}"/>
+	</p:selectCheckboxMenu>
+
+</p:panelGrid>

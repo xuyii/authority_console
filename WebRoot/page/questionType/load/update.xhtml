@@ -1,0 +1,41 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="上题名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{questionTypeReqAction.updateObj.viewTypeName}" styleClass="minLength"/>
+
+	<h:outputLabel value="真实名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{questionTypeReqAction.updateObj.paperTypeName}" styleClass="minLength"/>
+
+	<h:outputLabel value="基础题型">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<h:outputText value="#{questionTypeReqAction.updateObj.quesTypeIDStr}" />
+
+	<h:outputLabel value="描述" />
+	<p:inputText value="#{questionTypeReqAction.updateObj.description}" styleClass="minLength"/>
+
+	<h:outputLabel value="排序">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{questionTypeReqAction.updateObj.sequence}" styleClass="minLength"/>
+
+	<h:outputLabel value="容错分规则" id="splitScoreTypeSpan" rendered="#{questionTypeReqAction.updateObj.quesTypeID eq 2}">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<h:outputLabel value="备注" />
+	<p:inputText value="#{questionTypeReqAction.updateObj.remark}" styleClass="minLength"/>
+
+	<h:outputText value="#{questionTypeReqAction.updateObj.splitScoreTypeStr}" rendered="#{questionTypeReqAction.updateObj.quesTypeID eq 2}"/>
+
+	<h:outputLabel value="题目用途"/>
+	<p:selectCheckboxMenu value="#{questionTypeReqAction.viewTypeIDs}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+		<f:selectItems value="#{questionTypeReqAction.viewTypeList}" var="viewType" itemLabel="#{viewType.viewTypeName}" itemValue="#{viewType.viewTypeID}"/>
+	</p:selectCheckboxMenu>
+</p:panelGrid>

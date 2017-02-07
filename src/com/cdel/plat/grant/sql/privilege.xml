@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="privilege">
+	<select id="getAllPrivilegeRoleAndUser" parameterType="java.util.Map" resultType="String">
+        SELECT distinct p.actionURL
+        FROM RAD_ADMIN_PRIVILEGE p, RAD_ADMIN_ROLE_PRIVILEGE r
+        where r.privilegeID = p.privilegeID and p.treeType <![CDATA[>]]> 1 and r.roleID in (-1
+        <foreach collection="roleIDList" index="index" item="role" >
+			,#{role}
+		</foreach>
+		)
+    </select>
+
+    <select id="getPriByUser" resultType="Privilege">
+		SELECT distinct p.*
+		FROM RAD_ADMIN_USER_ROLE ar,RAD_ADMIN_ROLE_PRIVILEGE rp,RAD_ADMIN_PRIVILEGE p
+		WHERE ar.adminID = #{adminID} AND ar.roleID = rp.roleID AND rp.privilegeID = p.privilegeID AND p.treeType=2
+		UNION ALL
+		SELECT p.* FROM RAD_ADMIN_PRIVILEGE p WHERE p.treeType=1
+		ORDER BY treeType desc,treeLevel desc
+	</select>
+
+    <select id="getUserRole" resultType="Integer">
+		select roleID
+		from RAD_ADMIN_USER_ROLE where adminID=#{userID}
+	</select>
+
+	<delete id="removeUserRoleCon" parameterType="Integer">
+		DELETE FROM RAD_ADMIN_USER_ROLE WHERE adminID=#{userID}
+	</delete>
+
+	<insert id="conUserAndRole">
+		insert into RAD_ADMIN_USER_ROLE (roleID,adminID)
+		<foreach collection="roleArray" item="roleID" open="(" close=")" separator=" union all ">
+			select #{roleID},#{adminID}
+		</foreach>
+	</insert>
+
+    <select id="getPrivilegeList" resultType="Privilege" >
+		select privilegeID,neighborID,parentID,treeType,actionUrl,privilegeName,systemType
+		from RAD_ADMIN_PRIVILEGE
+		<where>
+			<if test="status !=null"> and treeType in (1,2) </if>
+			<if test="status !=null"> and status=#{status} </if>
+			<if test="status ==null"> and treeType in (1,2,12) </if>
+		</where>
+		order by systemType,sequence
+	</select>
+
+    <select id="getPrivilege" resultType="Privilege">
+		select privilegeID,neighborID,parentID,treeType,actionUrl,privilegeName,systemType,treeLevel,
+		creator,description,createTime,sequence
+		from RAD_ADMIN_PRIVILEGE where privilegeID = #{privilegeID}
+	</select>
+
+	<select id="getRolePri" resultType="Integer">
+		select privilegeID
+		from RAD_ADMIN_ROLE_PRIVILEGE where roleID=#{roleID}
+	</select>
+
+	<select id="getRolePri2" resultType="Integer">
+		select privilegeID
+		from RAD_ADMIN_ROLE_PRIVILEGE where roleID in (-1
+			<foreach collection="list" item="roleID" open="," separator=" , ">
+	        	#{roleID}
+	        </foreach>
+		)
+	</select>
+
+	<select id="getUserPri" resultType="Integer">
+		select privilegeID
+		from rad_admin_privilege where adminID=#{adminID}
+	</select>
+
+	<delete id="delPriByRoleID">
+		DELETE FROM RAD_ADMIN_ROLE_PRIVILEGE WHERE roleID = #{roleID}
+	</delete>
+
+	<delete id="delPriByRoleID2">
+		DELETE FROM RAD_ADMIN_ROLE_PRIVILEGE WHERE privilegeID = #{privilegeID}
+	</delete>
+
+	<insert id="insertPriByRoleID">
+		insert into RAD_ADMIN_ROLE_PRIVILEGE (roleID, privilegeID)
+		values
+		<foreach collection="plist" item="p" separator=" , ">
+			(#{roleID}, #{p})
+		</foreach>
+	</insert>
+
+	<insert id="insertPriByRoleID2" parameterType="java.util.HashMap">
+		insert into RAD_ADMIN_ROLE_PRIVILEGE (roleID,privilegeID)
+		<foreach collection="roleList" item="roleID" open="(" close=")" separator=" union all ">
+			select #{roleID},#{pID}
+		</foreach>
+	</insert>
+
+	<delete id="delPriByUserID">
+		DELETE FROM rad_admin_privilege WHERE adminID = #{adminID}
+	</delete>
+
+	<delete id="delPriByUserID2">
+		DELETE FROM rad_admin_privilege WHERE privilegeID = #{privilegeID}
+	</delete>
+
+	<insert id="insertPriByUserID">
+		insert into RAD_ADMIN_USER_PRIVILEGE (adminID,privilegeID)
+		<foreach collection="plist" item="p" open="(" close=")" separator=" union all ">
+			select #{userID},#{p}
+		</foreach>
+	</insert>
+
+	<insert id="insertPriByUserID2">
+		insert into RAD_ADMIN_USER_PRIVILEGE (adminID,privilegeID)
+		<foreach collection="userList" item="userID" open="(" close=")" separator=" union all ">
+			select #{userID},#{pID}
+		</foreach>
+	</insert>
+
+	<select id="getPriListByParentID" parameterType="Integer" resultType="Integer">
+		SELECT count(privilegeID) FROM RAD_ADMIN_PRIVILEGE WHERE parentID=#{parentID}
+	</select>
+
+	<delete id="deletePrivilege">
+		DELETE FROM RAD_ADMIN_PRIVILEGE WHERE privilegeID=#{privilegeID}
+	</delete>
+
+	<delete id="deleteNodes">
+		DELETE FROM RAD_ADMIN_PRIVILEGE WHERE privilegeID in
+		<foreach collection="array" item="pID" open="(" close=")" separator=" , ">
+        	#{pID}
+        </foreach>
+	</delete>
+
+	<delete id="removePriAdminUserRelation">
+		delete from rad_admin_privilege WHERE privilegeID in
+		<foreach collection="array" item="pID" open="(" close=")" separator=" , ">
+        	#{pID}
+        </foreach>
+	</delete>
+
+	<delete id="removePriRoleRelation">
+		delete from RAD_ADMIN_ROLE_PRIVILEGE where privilegeID in
+		<foreach collection="array" item="pID" open="(" close=")" separator=" , ">
+        	#{pID}
+        </foreach>
+	</delete>
+
+	<insert id="insertPrivilege" parameterType="Privilege">
+		INSERT INTO RAD_ADMIN_PRIVILEGE (
+			systemType,privilegeName,treeType,parentID,treeLevel,description,creator,createTime,sequence
+			<if test="neighborID != null and neighborID != ''">
+				,neighborID
+			</if>
+			<if test="actionURL != null and actionURL != ''">
+				,actionURL
+			</if>
+		) VALUES (
+			#{systemType},#{privilegeName}, #{treeType}, #{parentID},#{treeLevel}, #{description}, #{creator}, #{createTime}, #{sequence}
+			<if test="neighborID != null and neighborID != ''">
+				,#{neighborID}
+			</if>
+			<if test="actionURL != null and actionURL != ''">
+				,#{actionURL}
+			</if>
+		)
+		<selectKey resultType="int" keyProperty="privilegeID" >
+            SELECT @@IDENTITY AS privilegeID
+        </selectKey>
+	</insert>
+
+	<update id="updatePrivilege" parameterType="Privilege">
+		UPDATE RAD_ADMIN_PRIVILEGE
+		<set>
+            <if test="privilegeName != null and privilegeName != ''"> privilegeName=#{privilegeName}, </if>
+            <if test="description != null and description != ''"> description=#{description}, </if>
+        	<if test="sequence != null"> sequence=#{sequence}, </if>
+        	<if test="neighborID != null"> neighborID=#{neighborID} </if>
+        </set>
+		WHERE privilegeID=#{privilegeID}
+    </update>
+
+    <select id="judgePrivilegeNameHasExist" parameterType="Privilege" resultType="Integer">
+		SELECT count(privilegeID)
+		FROM RAD_ADMIN_PRIVILEGE
+		where privilegeName=#{privilegeName} and systemType=#{systemType}
+		<if test="privilegeID !=null"> and privilegeID != #{privilegeID}</if>
+		<if test="neighborID !=null"> and privilegeID != #{neighborID}</if>
+	</select>
+
+    <select id="judgePrivilegeActionHasExist" parameterType="Privilege" resultType="Integer">
+		SELECT count(privilegeID)
+		FROM RAD_ADMIN_PRIVILEGE
+		where actionURL=#{actionURL} and systemType=#{systemType}
+		<if test="privilegeID !=null"> and privilegeID != #{privilegeID}</if>
+		<if test="neighborID !=null"> and privilegeID != #{neighborID}</if>
+	</select>
+
+	<select id="getPriRole" resultType="Integer">
+		select roleID
+		from RAD_ADMIN_ROLE_PRIVILEGE where privilegeID=#{privilegeID}
+	</select>
+
+	<select id="getPriUser" resultType="Integer">
+		select adminID
+		from rad_admin_privilege where privilegeID=#{privilegeID}
+	</select>
+
+	<update id="updatePriTreeNode" parameterType="Privilege">
+		UPDATE RAD_ADMIN_PRIVILEGE set treeType=#{treeType} WHERE privilegeID=#{privilegeID}
+	</update>
+
+</mapper>

@@ -1,0 +1,46 @@
+--1.qz_chapter表缺少outChapterID、isExamine字段
+	ALTER TABLE QZ_CHAPTER ADD OUTCHAPTERID INT NULL
+	alter table QZ_CHAPTER add isExamine int
+--2.插入知识点时报错-缺少表PHONE_POINT_UPDATE、cache_tmp_major_log、cache_tmp_course_log
+	CREATE TABLE [dbo].[PHONE_POINT_UPDATE](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[pointID] [int] NOT NULL,
+	[updateTime] [smalldatetime] NOT NULL,
+PRIMARY KEY CLUSTERED
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON, FILLFACTOR = 80) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'自增ID' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'PHONE_POINT_UPDATE', @level2type=N'COLUMN',@level2name=N'ID'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'知识点ID' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'PHONE_POINT_UPDATE', @level2type=N'COLUMN',@level2name=N'pointID'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'更新时间' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'PHONE_POINT_UPDATE', @level2type=N'COLUMN',@level2name=N'updateTime'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'知识点修改日志表' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'PHONE_POINT_UPDATE'
+GO
+ALTER TABLE [dbo].[PHONE_POINT_UPDATE] ADD  CONSTRAINT [DF_PHONE_POINT_UPDATE_updateTime]  DEFAULT (getdate()) FOR [updateTime]
+GO
+CREATE TABLE [dbo].[cache_tmp_major_log](
+	[mid] [int] NOT NULL,
+	[time] [datetime] NOT NULL,
+	[tag] [tinyint] NOT NULL,
+	[ID] [int] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+ CONSTRAINT [PK_cache_tmp_major_log_ID_12_F8CA] PRIMARY KEY CLUSTERED
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON, FILLFACTOR = 80) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+CREATE TABLE [dbo].[cache_tmp_course_log](
+	[courseID] [int] NOT NULL,
+	[time] [datetime] NOT NULL,
+	[tag] [tinyint] NOT NULL,
+	[ID] [int] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+ CONSTRAINT [PK_cache_tmp_course_log_ID_35_C97D] PRIMARY KEY CLUSTERED
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON, FILLFACTOR = 80) ON [PRIMARY]
+) ON [PRIMARY]
+GO

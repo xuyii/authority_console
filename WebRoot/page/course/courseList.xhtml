@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>课程管理</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			
+			<h:outputLabel value="所属网站" />
+			<p:selectOneMenu id="sSiteID" value="#{courseAction.search.siteID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sBusinessID sMajorID" listener="#{businessOther.changeSiteID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="所属专业" />
+			<p:selectOneMenu id="sBusinessID" value="#{courseAction.search.businessID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sMajorID" listener="#{majorOther.changeBusinessID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{businessOther.businessList}" var="b" itemLabel="#{b.businessName}" itemValue="#{b.businessID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="所属辅导" />
+			<p:selectOneMenu id="sMajorID" value="#{courseAction.search.majorID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{majorOther.majorList}" var="m" itemLabel="#{m.majorName}" itemValue="#{m.majorID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="课程名" />
+			<p:inputText value="#{courseAction.search.courseName}" styleClass="minLength"/>
+			
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{courseAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{majorReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{courseAction.search}" rendered="#{courseAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="addDialog.show();" 
+				actionListener="#{courseReqAction.add}" rendered="#{courseAction.optAuth}" update=":addForm:addDialog" />
+		</p:menubar>
+		
+		<p:dataTable scrollable="true" scrollHeight="#{courseAction.heighti2}" 
+			widgetVar="table"
+			id="list"
+			binding="#{courseAction.pageTable}"
+			lazy="true"
+			value="#{courseAction.page}" 
+			rows="20"
+			var="course" 
+			paginator="true" 
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable" 
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{courseAction.viewAuth}"
+			>
+			<p:column headerText="操作" width="6%">
+				<p:rowToggler />
+			</p:column>
+			<p:rowExpansion>
+			<p:panelGrid columns="3" style="width:400px; text-align:left;">
+				<h:outputText value="章节策略" />
+				<h:outputText value="#{course.chapterListName}" />
+				<p:commandLink value="#{(not empty course.chapterListID)?'修改':'绑定'}" oncomplete="bindDialog.show();" actionListener="#{courseReqAction.updateBind(course.courseID,3)}" 
+					update=":bindForm:bindDialog" rendered="#{courseAction.optAuth}"/>
+				<h:outputText value="知识点策略" />
+				<h:outputText value="#{course.pointListName}" />
+				<p:commandLink value="#{(not empty course.pointListID)?'修改':'绑定'}" oncomplete="bindDialog2.show();" actionListener="#{courseReqAction.updateBind(course.courseID,4)}" 
+					update=":bindForm2:bindDialog2" rendered="#{courseAction.optAuth}"/>
+			</p:panelGrid>
+			</p:rowExpansion>
+			<p:column headerText="课程ID" width="10%">
+				<h:outputText value="#{course.courseID}" />
+			</p:column>
+			<p:column headerText="课程名" width="20%">
+				<h:outputText value="#{course.courseName}" />
+			</p:column>
+			<p:column headerText="辅导名称" width="20%">
+				<h:outputText value="#{course.majorName}" />
+			</p:column>
+			<p:column headerText="关联科目ID" width="10%">
+				<p:commandLink value="查看" oncomplete="bindDialog.show();" actionListener="#{courseReqAction.eduSubject(course.courseID)}" 
+					update=":bindFormX:bindDialog" rendered="#{courseAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="章节" width="10%">
+				<h:link value="章节" rendered="#{courseAction.optAuth}" 
+					outcome="/page/chapter/chapterList" includeViewParams="true" target="_blank">
+					<f:param name="courseID" value="#{course.courseID}"/>
+					<f:param name="chapterListID" value="#{course.chapterListID}"/>
+				</h:link>
+			</p:column>
+			<p:column headerText="排序" width="8%">
+				<h:outputText value="#{course.sequence}" />
+			</p:column>
+			<p:column headerText="操作" width="8%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{courseReqAction.update(course.courseID)}" update=":loadForm:loadDialog" rendered="#{courseAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="8%">
+				<p:commandLink id="tStatus" value="#{course.statusStr}" update=":info tStatus" actionListener="#{courseReqAction.changeStatus(course.courseID,course.status)}" rendered="#{courseAction.optAuth}"/>
+				<h:outputText value="#{course.statusStr}" rendered="#{!courseAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	
+	<!-- 添加/修改页面 -->
+	<h:form id="addForm" >
+		<p:dialog id="addDialog" header="添加" widgetVar="addDialog" resizable="false" showEffect="fade" hideEffect="fade" height="300">
+			<ui:include src="load/add.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{courseReqAction.flag}"/>
+					<p:commandButton value="添加" actionListener="#{courseReqAction.updateSubmit}" update="msg" oncomplete="optResult('addDialog',args,'#{courseReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="addDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{courseReqAction.flag}"/>
+					<h:inputHidden value="#{courseReqAction.updateObj.courseID}"/>
+					<h:inputHidden value="#{courseReqAction.updateObj.majorID}"/>
+					<p:commandButton value="修改" actionListener="#{courseReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{courseReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="bindFormX" >
+		<p:dialog id="bindDialog" header="关联科目" widgetVar="bindDialog" resizable="false" showEffect="fade" hideEffect="fade" height="40">
+			<p:panelGrid columns="1">
+				<ui:repeat value="#{courseReqAction.eduSubjectIDList}" var="course" >
+					<p:outputLabel value="#{course.eduSubjectID}" /><br />
+				</ui:repeat>
+			</p:panelGrid>
+		</p:dialog>
+	</h:form>
+	<h:form id="bindForm" >
+		<p:dialog id="bindDialog" header="绑定章节策略" widgetVar="bindDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<f:facet name="header">
+				<h:panelGroup style="display:block; text-align:center">
+					<h:link value="查看章节策略" outcome="/page/chapterList/chapterListList" includeViewParams="true" target="_blank">
+						<f:param name="siteID" value="#{courseReqAction.updateObj.siteID}"/>
+						<f:param name="businessID" value="#{courseReqAction.updateObj.businessID}"/>
+						<f:param name="majorID" value="#{courseReqAction.updateObj.majorID}"/>
+						<f:param name="courseID" value="#{courseReqAction.updateObj.courseID}"/>
+					</h:link>
+				</h:panelGroup>
+			</f:facet>	
+			<ui:include src="load/bind.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{courseReqAction.flag}"/>
+					<h:inputHidden value="#{courseReqAction.updateObj.courseID}"/>
+					<p:commandButton value="修改" actionListener="#{courseReqAction.updateSubmit}" update="msg" oncomplete="optResult('bindDialog',args,8);"/>
+					<p:commandButton type="button" value="关闭" onclick="bindDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="bindForm2" >
+		<p:dialog id="bindDialog2" header="绑定知识点策略" widgetVar="bindDialog2" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<f:facet name="header">
+				<h:panelGroup style="display:block; text-align:center">
+					<h:link value="查看知识点策略" outcome="/page/pointList/pointListList" includeViewParams="true" target="_blank">
+						<f:param name="siteID" value="#{courseReqAction.updateObj.siteID}"/>
+						<f:param name="businessID" value="#{courseReqAction.updateObj.businessID}"/>
+						<f:param name="majorID" value="#{courseReqAction.updateObj.majorID}"/>
+						<f:param name="courseID" value="#{courseReqAction.updateObj.courseID}"/>
+					</h:link>
+				</h:panelGroup>
+			</f:facet>	
+			<ui:include src="load/bind2.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{courseReqAction.flag}"/>
+					<h:inputHidden value="#{courseReqAction.updateObj.courseID}"/>
+					<p:commandButton value="修改" actionListener="#{courseReqAction.updateSubmit}" update="msg" oncomplete="optResult('bindDialog2',args,8);"/>
+					<p:commandButton type="button" value="关闭" onclick="bindDialog2.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

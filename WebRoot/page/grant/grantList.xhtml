@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>操作树管理</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:tree id="tree" value="#{privilegeAction.root}" var="doc" selectionMode="single" >
+	        <p:ajax event="select" listener="#{privilegeAction.onNodeSelect}" 
+	        	oncomplete="showDialog.show();" update=":showForm:showDialog"/>
+	 
+	        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+	            <h:outputText value="#{doc.privilegeName}"/>
+	        </p:treeNode>
+	    </p:tree>
+	</p:panel>
+	</h:form>
+	
+	<h:form id="showForm" >
+		<p:dialog id="showDialog" header="节点信息" widgetVar="showDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/show.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<p:commandButton value="添加分支" actionListener="#{privilegeReqAction.add}" oncomplete="loadDialog.show();" update=":loadForm:loadDialog" rendered="#{!privilegeAction.yezi}"/>
+					<p:spacer width="5" />
+					<p:commandButton value="添加子节点" actionListener="#{privilegeReqAction.addYezi}" oncomplete="loadYeziDialog.show();" update=":loadYeziForm:loadYeziDialog" rendered="#{!privilegeAction.yezi}"/>
+					<p:spacer width="5" />
+					<p:commandButton value="修改分支" actionListener="#{privilegeReqAction.update}" oncomplete="loadDialog.show();" update=":loadForm:loadDialog" rendered="#{!privilegeAction.yezi}"/>
+					<p:spacer width="5" />
+					<p:commandButton value="修改子节点" actionListener="#{privilegeReqAction.updateYezi}" oncomplete="loadYeziDialog.show();" update=":loadYeziForm:loadYeziDialog" rendered="#{privilegeAction.yezi}"/>
+					<p:spacer width="5" />
+					<p:commandButton value="更新状态" actionListener="#{privilegeReqAction.changeStatus}" update=":showForm:showDialog" oncomplete="showDialog.show();" rendered="#{privilegeAction.yezi}"/>
+					<p:spacer width="5" />
+					<p:commandButton value="删除" onstart="return confirmDel();" actionListener="#{privilegeReqAction.deleteSubmit}" update="msg" oncomplete="optResult('showDialog',args,'2');" />
+					<p:spacer width="5" />
+					<p:commandButton type="button" value="关闭" onclick="showDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="#{(privilegeReqAction.flag==0)?'添加':'修改'}" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200" modal="true">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{privilegeReqAction.flag}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.privilegeID}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.parentID}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.treeLevel}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.systemType}"/>
+					<p:commandButton value="#{(privilegeReqAction.flag==0)?'添加':'修改'}" actionListener="#{privilegeReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{privilegeReqAction.flag}');showDialog.hide();"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadYeziForm" >
+		<p:dialog id="loadYeziDialog" header="#{(privilegeReqAction.flag==0)?'添加':'修改'}" widgetVar="loadYeziDialog" resizable="false" showEffect="fade" hideEffect="fade" height="350" modal="true">
+			<ui:include src="load/updateYezi.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{privilegeReqAction.flag}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.privilegeID}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.parentID}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.treeLevel}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.systemType}"/>
+					<h:inputHidden value="#{privilegeReqAction.updateObj.neighborID}"/>
+					<p:commandButton value="#{(privilegeReqAction.flag==0)?'添加':'修改'}" actionListener="#{privilegeReqAction.updateSubmitYezi}" update="msg" oncomplete="optResult('loadYeziDialog',args,'#{privilegeReqAction.flag}');showDialog.hide();"/>
+					<p:commandButton type="button" value="关闭" onclick="loadYeziDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

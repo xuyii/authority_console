@@ -1,0 +1,23 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="课程名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{courseReqAction.updateObj.courseName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="排序">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{courseReqAction.updateObj.sequence}" styleClass="minLength"/>
+
+	<h:outputLabel value="是否为实验班课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneRadio value="#{courseReqAction.updateObj.isADVC}" >
+		<f:selectItems value="#{courseReqAction.yesornos.entrySet()}" var="y" itemLabel="#{y.value}" itemValue="#{y.key}"/>
+	</p:selectOneRadio>
+	
+</p:panelGrid>

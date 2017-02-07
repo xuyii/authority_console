@@ -1,0 +1,38 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="所属课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{siteCourseWareReqAction.updateObj.courseID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mSiteCourseID" listener="#{siteCourseOther.changeCourseID2}" />
+		<f:selectItems value="#{courseOther.courseList2}" var="c" itemLabel="#{c.courseName}" itemValue="#{c.courseID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="所属对外课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mSiteCourseID" value="#{siteCourseWareReqAction.updateObj.siteCourseID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{siteCourseOther.siteCourseList2}" var="c" itemLabel="#{c.siteCourseName}" itemValue="#{c.siteCourseID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="课件名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{siteCourseWareReqAction.updateObj.siteCwName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="所属年份">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{siteCourseWareReqAction.updateObj.yearNo}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{siteCourseWareReqAction.yearNos.entrySet()}" var="y" itemLabel="#{y.value}" itemValue="#{y.key}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="排序">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{siteCourseWareReqAction.updateObj.sequence}" styleClass="minLength"/>
+
+</p:panelGrid>

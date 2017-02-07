@@ -1,0 +1,26 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="策略名称">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterListReqAction.updateObj.chapterListName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="排序">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterListReqAction.updateObj.sequence}" styleClass="minLength"/>
+	<h:outputLabel value="策略名称用途">
+		<span class="requiredFlag"></span>
+	</h:outputLabel>	
+	<p:selectCheckboxMenu value="#{chapterListReqAction.strategyUses}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+      <f:selectItem itemLabel="线上(答疑板和题库)" itemValue="1" />		
+      	<f:selectItem itemLabel="正保题库" itemValue="2" />
+      	<f:selectItem itemLabel="移动班" itemValue="3" />
+      	<f:selectItem itemLabel="开放大学" itemValue="4" />		
+	</p:selectCheckboxMenu>
+	<h:inputHidden value="#{chapterListReqAction.updateObj.courseID}"/>
+	<h:inputHidden value="#{chapterListReqAction.updateObj.creator}"/>
+</p:panelGrid>

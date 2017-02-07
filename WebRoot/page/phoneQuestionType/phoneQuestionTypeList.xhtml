@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>题目类别</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			
+			<h:outputLabel value="题目类型" />
+			<p:inputText value="#{phoneQuestionTypeAction.search.phoneQueTypeName}" styleClass="minLength"/>
+			
+			<h:outputLabel value="状态" />
+			<p:selectOneMenu value="#{phoneQuestionTypeAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{phoneQuestionTypeReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{phoneQuestionTypeAction.search}" rendered="#{phoneQuestionTypeAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="addDialog.show();" 
+				actionListener="#{phoneQuestionTypeReqAction.add}" rendered="#{phoneQuestionTypeAction.optAuth}" update=":addForm:addDialog" />
+		</p:menubar>
+		
+		<p:dataTable scrollable="true" scrollHeight="#{phoneQuestionTypeAction.heighti2}" 
+			widgetVar="table"
+			id="list"
+			binding="#{phoneQuestionTypeAction.pageTable}"
+			lazy="true"
+			value="#{phoneQuestionTypeAction.page}" 
+			rows="20"
+			var="phoneQuestionType" 
+			paginator="true" 
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable" 
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{phoneQuestionTypeAction.viewAuth}"
+			>
+			<p:column headerText="类型ID" width="10%">
+				<h:outputText value="#{phoneQuestionType.phoneQueTypeID}" />
+			</p:column>
+			<p:column headerText="题目类型" width="30%">
+				<h:outputText value="#{phoneQuestionType.phoneQueTypeName}" />
+			</p:column>
+			<p:column headerText="课程名称" width="20%">
+				<h:outputText value="#{phoneQuestionType.courseName}" />
+			</p:column>
+			<p:column headerText="创建人" width="10%">
+				<h:outputText value="#{phoneQuestionType.creator}" />
+			</p:column>
+			<p:column headerText="创建时间" width="10%">
+				<h:outputText value="#{phoneQuestionType.createTimeStr}" />
+			</p:column>
+			<p:column headerText="操作" width="10%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{phoneQuestionTypeReqAction.update(phoneQuestionType.phoneQueTypeID)}" update=":loadForm:loadDialog" rendered="#{phoneQuestionTypeAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="10%">
+				<p:commandLink id="tStatus" value="#{phoneQuestionType.statusStr}" update=":info tStatus" actionListener="#{phoneQuestionTypeReqAction.changeStatus(phoneQuestionType.phoneQueTypeID,phoneQuestionType.status)}" rendered="#{phoneQuestionTypeAction.optAuth}"/>
+				<h:outputText value="#{phoneQuestionType.statusStr}" rendered="#{!phoneQuestionTypeAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	
+	<!-- 添加/修改页面 -->
+	<h:form id="addForm" >
+		<p:dialog id="addDialog" header="添加" widgetVar="addDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/add.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{phoneQuestionTypeReqAction.flag}"/>
+					<p:commandButton value="添加" actionListener="#{phoneQuestionTypeReqAction.updateSubmit}" update="msg" oncomplete="optResult('addDialog',args,'#{phoneQuestionTypeReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="addDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{phoneQuestionTypeReqAction.flag}"/>
+					<h:inputHidden value="#{phoneQuestionTypeReqAction.updateObj.phoneQueTypeID}"/>
+					<p:commandButton value="修改" actionListener="#{phoneQuestionTypeReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{phoneQuestionTypeReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>科目设置</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			
+			<h:outputLabel value="科目编号" />
+			<p:inputText value="#{subjectAction.search.cwareSubjectID}" styleClass="minLength"/>
+			
+			<h:outputLabel value="科目名称" />
+			<p:inputText value="#{subjectAction.search.cwareSubjectName}" styleClass="minLength"/>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{subjectAction.search}" rendered="#{subjectAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+		<p:menubar>
+			<p:menuitem id="subjectBtn" value="同步类别" icon="ui-icon-arrowrefresh-1-w" 
+				actionListener="#{subjectReqAction.getRemoteData}" 
+				oncomplete="optResultAlert(args,6);" 
+				rendered="#{subjectReqAction.optAuth}" />
+			<p:menuitem id="wareBtn" value="同步课件" icon="ui-icon-arrowrefresh-1-w" 
+				actionListener="#{subjectReqAction.getRemoteCwareData}" 
+				oncomplete="optResultAlert(args,6);" 
+				rendered="#{subjectReqAction.optAuth}" />
+		</p:menubar>
+		
+		<p:dataTable scrollable="true" scrollHeight="#{subjectAction.heighti2}" 
+			widgetVar="table"
+			id="list"
+			binding="#{subjectAction.pageTable}"
+			lazy="true"
+			value="#{subjectAction.page}" 
+			rows="20"
+			var="subject" 
+			paginator="true" 
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable" 
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{subjectAction.viewAuth}"
+			>
+			<p:column headerText="科目编号" width="10%">
+				<h:outputText value="#{subject.cwareSubjectID}" />
+			</p:column>
+			<p:column headerText="对外课程" width="12%">
+				<h:outputText value="#{subject.siteCourseName}" />
+			</p:column>
+			<p:column headerText="科目名称" width="12%">
+				<h:outputText value="#{subject.cwareSubjectName}" />
+			</p:column>
+			<p:column headerText="辅导类别" width="20%">
+				<h:outputText value="[#{subject.cwareEduID}]#{subject.cwareEduName}【#{subject.siteName}】" />
+			</p:column>
+			<p:column headerText="排序" width="10%">
+				<h:outputText value="#{subject.orderno}" />
+			</p:column>
+			<p:column headerText="操作时间" width="15%">
+				<h:outputText value="#{subject.updateTimeStr}" />
+			</p:column>
+			<p:column headerText="操作人" width="10%">
+				<h:outputText value="#{subject.operator}" />
+			</p:column>
+			<p:column headerText="操作" width="11%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{subjectReqAction.update(subject.cwareSubjectID)}" update=":loadForm:loadDialog" rendered="#{subjectAction.optAuth}"/>
+				<p:spacer width="5"/>
+				<p:commandLink value="删除" onstart="return confirmDel();" actionListener="#{subjectReqAction.delete(subject.cwareSubjectID)}" oncomplete="optResultAlert(args,2);" rendered="#{subjectAction.optAuth}" update=":info"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+		<ui:include src="/page/common/blockUI3.xhtml">
+			<ui:param name="reflushID" value="dataTablePanel" />
+			<ui:param name="triggerID" value="subjectBtn" />
+		</ui:include>
+		<ui:include src="/page/common/blockUI3.xhtml">
+			<ui:param name="reflushID" value="dataTablePanel" />
+			<ui:param name="triggerID" value="wareBtn" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	
+	<!-- 添加/修改页面 -->
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{subjectReqAction.flag}"/>
+					<h:inputHidden value="#{subjectReqAction.updateObj.cwareSubjectID}"/>
+					<p:commandButton value="修改" onstart="return confirmDia('修改科目信息将会移除当前科目信息下所有的考试中心信息,是否继续？')" actionListener="#{subjectReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{subjectReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

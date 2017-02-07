@@ -1,0 +1,19 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="分支名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{privilegeReqAction.updateObj.privilegeName}"/>
+	
+	<h:outputLabel value="描述"/>
+	<p:inputText value="#{privilegeReqAction.updateObj.description}"/>
+	
+	<h:outputLabel value="排序优先级">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{privilegeReqAction.updateObj.sequence}"/>
+	
+</p:panelGrid>

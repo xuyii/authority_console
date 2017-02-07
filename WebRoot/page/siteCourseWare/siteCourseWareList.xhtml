@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>课件设置</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			
+			<h:outputLabel value="所属网站" />
+			<p:selectOneMenu id="sSiteID" value="#{siteCourseWareAction.search.siteID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sBusinessID sMajorID sCourseID sSiteCourseID" listener="#{businessOther.changeSiteID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="所属专业" />
+			<p:selectOneMenu id="sBusinessID" value="#{siteCourseWareAction.search.businessID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sMajorID sCourseID sSiteCourseID" listener="#{majorOther.changeBusinessID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{businessOther.businessList}" var="b" itemLabel="#{b.businessName}" itemValue="#{b.businessID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="所属辅导" />
+			<p:selectOneMenu id="sMajorID" value="#{siteCourseWareAction.search.majorID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains" >
+				<p:ajax event="change" update="sCourseID sSiteCourseID" listener="#{courseOther.changeMajorID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{majorOther.majorList}" var="m" itemLabel="#{m.majorName}" itemValue="#{m.majorID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="所属课程" />
+			<p:selectOneMenu id="sCourseID" value="#{siteCourseWareAction.search.courseID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains" >
+				<p:ajax event="change" update="sSiteCourseID" listener="#{siteCourseOther.changeCourseID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{courseOther.courseList}" var="c" itemLabel="#{c.courseName}" itemValue="#{c.courseID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="所属对外课程" />
+			<p:selectOneMenu id="sSiteCourseID" value="#{siteCourseWareAction.search.siteCourseID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItem itemLabel="没有对外课程" itemValue="-1" />
+				<f:selectItems value="#{siteCourseOther.siteCourseList}" var="c" itemLabel="#{c.siteCourseName}" itemValue="#{c.siteCourseID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="年份" />
+			<p:selectOneMenu value="#{siteCourseWareAction.search.yearNo}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{siteCourseWareReqAction.yearNos.entrySet()}" var="y" itemLabel="#{y.value}" itemValue="#{y.key}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="名称关键字" />
+			<p:inputText value="#{siteCourseWareAction.search.siteCwName}" styleClass="minLength"/>
+			
+			<h:outputLabel value="认证编号" />
+			<p:inputText value="#{siteCourseWareAction.search.cwID}" styleClass="minLength"/>
+			
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{siteCourseWareAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{siteCourseWareReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{siteCourseWareAction.search}" rendered="#{siteCourseWareAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+		<p:dataTable scrollable="true" scrollHeight="#{siteCourseWareAction.heighti2}" 
+			widgetVar="table"
+			id="list"
+			binding="#{siteCourseWareAction.pageTable}"
+			lazy="true"
+			value="#{siteCourseWareAction.page}" 
+			rows="20"
+			var="siteCourseWare" 
+			paginator="true" 
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable" 
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{siteCourseWareAction.viewAuth}"
+			>
+			<p:column headerText="编号" width="10%">
+				<h:outputText value="#{siteCourseWare.siteCwID}" />
+			</p:column>
+			<p:column headerText="课件名【班级】" width="30%">
+				<h:outputText value="#{siteCourseWare.siteCwName}【#{siteCourseWare.cwareClassName}】" />
+			</p:column>
+			<p:column headerText="【siteCourseID】所属对外课程" width="20%">
+				<h:outputText value="【#{siteCourseWare.siteCourseID}】#{siteCourseWare.siteCourseName}" />
+			</p:column>
+			<p:column headerText="认证编号" width="20%">
+				<h:outputText value="#{siteCourseWare.cwID}" />
+			</p:column>
+			<p:column headerText="操作" width="10%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{siteCourseWareReqAction.update(siteCourseWare.siteCwID)}" update=":loadForm:loadDialog" rendered="#{siteCourseWareAction.optAuth}"/>
+				<p:spacer width="5" />
+				<p:commandLink value="删除" actionListener="#{siteCourseWareReqAction.delete(siteCourseWare.siteCwID)}" oncomplete="optResultAlert(args, 2);" rendered="#{siteCourseWareAction.deleteAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="10%">
+				<p:commandLink id="tStatus" value="#{siteCourseWare.statusStr}" update=":info tStatus" actionListener="#{siteCourseWareReqAction.changeStatus(siteCourseWare.siteCwID,siteCourseWare.status)}" rendered="#{siteCourseWareAction.optAuth}"/>
+				<h:outputText value="#{siteCourseWare.statusStr}" rendered="#{!siteCourseWareAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	
+	<!-- 添加/修改页面 -->
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{siteCourseWareReqAction.flag}"/>
+					<h:inputHidden value="#{siteCourseWareReqAction.updateObj.siteCwID}"/>
+					<h:inputHidden value="#{siteCourseWareReqAction.updateObj.oriSiteCourseID}"/>
+					<p:commandButton value="修改" actionListener="#{siteCourseWareReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{siteCourseWareReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

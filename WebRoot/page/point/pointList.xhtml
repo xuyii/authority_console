@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>知识点</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+	<script>
+		function submitRelPoint(){
+			var parr=new Array();
+			jQuery("#relForm\\:updatePanelGrid").find(".relPoint").each(function(i){
+				var className=jQuery(this).attr("class");
+				var arr=className.split(" ");
+				var pointID="";
+				if(arr!=null &amp;&amp; arr.length>0){
+					pointID=arr[arr.length-1];
+				}
+				parr[i]=pointID;
+			});
+			var str="";
+			jQuery("#relForm\\:updatePanelGrid").find(".relPoint .ui-chkbox-icon").each(function(i){
+				var className=jQuery(this).attr("class");
+				var ind=className.indexOf(" ui-icon-check");
+				if(ind>-1){
+					str=str+","+parr[i];
+				}
+			});
+			var pointID=jQuery("#relForm\\:relPointID").val();
+			setRelPoints([{name:'pointID', value:pointID},{name:'pointList', value:str}]);
+			return false;
+		}
+		//添加form回调函数
+		function addcallBack(){
+			$("#addForm\\:pointName").val("");
+			$("#addForm\\:quesAnswerNum").val("");
+			$("#addForm\\:pointDescribe").val("");
+			$("#addForm\\:pointLevel_input").val("");
+			$("#addForm\\:pointLevel_label").text("--请选择--");
+			var sequence = $("#addForm\\:sequence").val();
+			if( sequence != "" &amp;&amp; sequence > 0 ){
+				sequence = parseInt(sequence)+1;
+			}
+			$("#addForm\\:sequence").val(sequence);
+			$("#addForm\\:pageNum").val("");
+			$("#addForm\\:typeList").val("");
+			$("#addForm\\:score").val("");
+			$("#addForm\\:thought").val("");
+			$("#addForm\\:remind").val("");
+		}
+	</script>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:remoteCommand name="setRelPoints" actionListener="#{pointReqAction.submitRel}" oncomplete="optResult('relDialog',args,'3');"/>
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+
+			<h:outputLabel value="知识点策略" />
+			<p:selectOneMenu value="#{pointAction.search.pointListID}" style="width:200px;" panelStyleClass="minLength" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{pointListOther.pointListList}" var="p" itemLabel="#{p.pointListName}" itemValue="#{p.pointListID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel value="知识点名称" />
+			<h:panelGroup style="display:block;">
+				<p:autoComplete panelStyleClass="minLength"
+					value="#{pointAction.search.pointName}" completeMethod="#{comRequestMethod.completePointName}" var="pointName" itemLabel="#{pointName}" itemValue="#{pointName}" queryDelay="500" />
+				<p:graphicImage url="/resources/images/ques.png" style="cursor:pointer;" onclick="autoInfo();"/>
+			</h:panelGroup>
+
+			<h:outputLabel value="章节策略" />
+			<p:selectOneMenu value="#{pointAction.search.chapterListID}" style="width:200px;" panelStyleClass="minLength" >
+				<p:ajax event="change" update="sChapterID" listener="#{chapterOther.changeChapterListID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{chapterListOther.chapterListList}" var="c" itemLabel="#{c.chapterListName}" itemValue="#{c.chapterListID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel value="章节" />
+			<p:selectOneMenu id="sChapterID" value="#{pointAction.search.chapterID}" style="width:200px;" panelStyleClass="minLength" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{chapterOther.chapterList}" var="c" itemLabel="#{c.chapterName}" itemValue="#{c.chapterID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{pointAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{pointReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{pointAction.search}" rendered="#{pointAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>
+		</p:panelGrid>
+		</p:fieldset>
+
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="addDialog.show();"
+				actionListener="#{pointReqAction.add}" rendered="#{pointAction.optAuth}" update=":addForm:addDialog" />
+		</p:menubar>
+
+		<p:dataTable scrollable="true" scrollHeight="#{pointAction.heighti2}"
+			widgetVar="table"
+			id="list"
+			binding="#{pointAction.pageTable}"
+			lazy="true"
+			value="#{pointAction.page}"
+			rows="20"
+			var="point"
+			paginator="true"
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable"
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{pointAction.viewAuth}"
+			>
+			<p:column headerText="pointID" width="6%" sortBy="#{point.pointID}">
+				<h:outputText value="#{point.pointID}" />
+			</p:column>
+			<p:column headerText="章节" width="12%">
+				<h:outputText value="#{point.chapterName}" />
+			</p:column>
+			<p:column headerText="名称" width="20%" sortBy="#{point.pointName}">
+				<h:outputText value="#{point.pointName}" />
+			</p:column>
+			<p:column headerText="做题数量" width="6%">
+				<h:outputText value="#{point.quesAnswerNum}" />
+			</p:column>
+			<p:column headerText="做题正确率(%)" width="6%">
+				<h:outputText value="#{point.quesCorrectRate}" />
+			</p:column>
+			<p:column headerText="创建人" width="5%">
+				<h:outputText value="#{point.realName}" />
+			</p:column>
+			<p:column headerText="创建时间" width="10%">
+				<h:outputText value="#{point.createTimeStr}" />
+			</p:column>
+			<p:column headerText="复制" width="4%">
+				<p:commandLink value="复制" oncomplete="optResultAlert(args,4);" actionListener="#{pointReqAction.copy(point.pointID)}" rendered="#{pointAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="操作" width="14%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{pointReqAction.update(point.pointID)}" update=":loadForm:loadDialog" rendered="#{pointAction.optAuth}"/>
+				<p:spacer width="10"/>
+				<p:commandLink value="相关知识点" oncomplete="relDialog.show();" actionListener="#{pointReqAction.updateRel(point.pointID,point.pointListID,point.pointList)}" update=":relForm:relDialog" rendered="#{pointAction.optAuth}"/>
+				<p:spacer width="10"/>
+				<p:commandLink value="设置高频考点" oncomplete="highFrequencyDialog.show();" actionListener="#{pointReqAction.updateHighFrequency(point.pointID)}" update=":highFrequencyForm:highFrequencyDialog" rendered="#{pointAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="5%">
+				<p:commandLink id="tStatus" value="#{point.statusStr}" update=":info tStatus" actionListener="#{pointReqAction.changeStatus(point.pointID,point.status)}" rendered="#{pointAction.optAuth}"/>
+				<h:outputText value="#{point.statusStr}" rendered="#{!pointAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+
+	<!-- 添加/修改页面 -->
+	<h:form id="addForm" >
+		<p:dialog id="addDialog" header="添加" widgetVar="addDialog" resizable="false" showEffect="fade" hideEffect="fade" height="400">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{pointReqAction.flag}"/>
+					<p:commandButton value="添加" actionListener="#{pointReqAction.updateSubmit}" update="msg" oncomplete="optResultAlert(args,'#{pointReqAction.flag}','addcallBack');"/>
+					<p:commandButton type="button" value="关闭" onclick="addDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="400">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{pointReqAction.flag}"/>
+					<h:inputHidden value="#{pointReqAction.updateObj.pointID}"/>
+					<p:commandButton value="修改" actionListener="#{pointReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{pointReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<!-- 添加相关知识点页面 -->
+	<h:form id="relForm" >
+		<p:dialog id="relDialog" header="相关知识点" widgetVar="relDialog" resizable="false" showEffect="fade" hideEffect="fade" height="400" width="750">
+			<ui:include src="load/relPoint.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<h:inputHidden id="relPointID" value="#{pointReqAction.pointID}"/>
+					<p:commandButton value="修改" onstart="return submitRelPoint();" />
+					<p:commandButton type="button" value="关闭" onclick="relDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<!-- 设置高频考点 -->
+	<h:form id="highFrequencyForm">
+		<p:dialog id="highFrequencyDialog" header="设置高频考点" widgetVar="highFrequencyDialog" resizable="false" showEffect="fade" hideEffect="fade" height="100" width="400">
+			<ui:include src="load/highFrequency.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg_highFrequency"/>
+					<h:inputHidden value="#{pointReqAction.flag}"/>
+					<h:inputHidden value="#{pointReqAction.updateObjExtend.pointID}"/>
+					<p:commandButton value="#{pointReqAction.flag==0?'新增':'修改'}" actionListener="#{pointReqAction.updateHighFrequencySubmit}" update = "msg_highFrequency" oncomplete="optResult('highFrequencyDialog',args,'#{pointReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="highFrequencyDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+
+</h:body>
+</html>

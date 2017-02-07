@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="privilegerel">
+
+	<select id="getPrivilegeRelByPri" resultType="PrivilegeRel">
+		SELECT relPrivilegeID,relNeighborID 
+		FROM RAD_ADMIN_PRIVILEGE_REL 
+		WHERE privilegeID in (-1
+			<foreach collection="list" item="p" open="," separator=" , ">
+	        	#{p}
+	        </foreach>
+		)
+	</select>
+	
+</mapper>

@@ -1,0 +1,57 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="所属网站">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mSiteID" value="#{chapterListReqAction.updateObj.siteID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mBusinessID mMajorID mCourseID" listener="#{businessOther.changeSiteID2}" />
+		<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="所属专业">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mBusinessID" value="#{chapterListReqAction.updateObj.businessID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mMajorID mCourseID" listener="#{majorOther.changeBusinessID2}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{businessOther.businessList2}" var="b" itemLabel="#{b.businessName}" itemValue="#{b.businessID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="所属辅导">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mMajorID" value="#{chapterListReqAction.updateObj.majorID}" style="width:200px;" panelStyleClass="minLength" >
+		<p:ajax event="change" update="mCourseID" listener="#{courseOther.changeMajorID2}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{majorOther.majorList2}" var="m" itemLabel="#{m.majorName}" itemValue="#{m.majorID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="所属课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mCourseID" value="#{chapterListReqAction.updateObj.courseID}" style="width:200px;" panelStyleClass="minLength" >
+		<f:selectItems value="#{courseOther.courseList2}" var="c" itemLabel="#{c.courseName}" itemValue="#{c.courseID}"/>
+	</p:selectOneMenu>
+	
+	<h:outputLabel value="章节策略名">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterListReqAction.updateObj.chapterListName}" styleClass="minLength"/>
+	
+	<h:outputLabel value="顺序号">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:inputText value="#{chapterListReqAction.updateObj.sequence}" styleClass="minLength"/>
+	<h:outputLabel value="策略名称用途">
+		<span class="requiredFlag"></span>
+	</h:outputLabel>	
+	<p:selectCheckboxMenu value="#{chapterListReqAction.strategyUses}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+		<f:selectItem itemLabel="线上(答疑板和题库)" itemValue="1" />		
+      	<f:selectItem itemLabel="正保题库" itemValue="2" />
+      	<f:selectItem itemLabel="移动班" itemValue="3" />
+      	<f:selectItem itemLabel="开放大学" itemValue="4" />		
+	</p:selectCheckboxMenu>
+</p:panelGrid>

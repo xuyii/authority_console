@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>书本管理</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+			
+			<h:outputLabel for="sMajorID" value="辅导名称" />
+			<p:selectOneMenu id="sMajorID" value="#{bookAction.search.majorID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+				<p:ajax event="change" update="sCourseID" listener="#{courseOther.changeMajorID}" />
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{majorOther.majorList}" var="major" itemLabel="#{major.majorName}" itemValue="#{major.majorID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel for="sCourseID" value="课程名称" />
+			<p:selectOneMenu id="sCourseID" value="#{bookAction.search.courseID}" style="width:200px;" panelStyleClass="minLength" filter="true" filterMatchMode="contains">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{courseOther.courseList}" var="c" itemLabel="#{c.courseName}" itemValue="#{c.courseID}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{bookAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{bookReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+			
+			<h:outputLabel value="书本名" />
+			<p:inputText value="#{bookAction.search.bookName}" styleClass="minLength"/>
+			
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{bookAction.search}" rendered="#{bookAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>	
+		</p:panelGrid>
+		</p:fieldset>
+		
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="loadDialog.show();" 
+				actionListener="#{bookReqAction.add}" rendered="#{bookAction.optAuth}" update=":loadForm:loadDialog" />
+		</p:menubar>
+		
+		<p:dataTable scrollable="true" scrollHeight="#{bookAction.heighti2}" 
+			widgetVar="table"
+			id="list"
+			binding="#{bookAction.pageTable}"
+			lazy="true"
+			value="#{bookAction.page}" 
+			rows="20"
+			var="book" 
+			paginator="true" 
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable" 
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{bookAction.viewAuth}"
+			>
+			<p:column headerText="ID" width="10%">
+				<h:outputText value="#{book.bookID}" />
+			</p:column>
+			<p:column headerText="书本名" width="20%">
+				<h:outputText value="#{book.bookName}" />
+			</p:column>
+			<p:column headerText="分页名称" width="20%">
+				<h:outputText value="#{book.pageSubject}" />
+			</p:column>
+			<p:column headerText="题号名称" width="20%">
+				<h:outputText value="#{book.quesSubject}" />
+			</p:column>
+			<p:column headerText="操作" width="20%">
+				<p:commandLink value="查看" oncomplete="showDialog.show();" actionListener="#{bookReqAction.show(book.bookID)}" update=":showForm:showDialog" rendered="#{bookAction.viewAuth}"/>
+				<p:spacer width="5px"/>
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{bookReqAction.update(book.bookID)}" update=":loadForm:loadDialog" rendered="#{bookAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="10%">
+				<p:commandLink id="tStatus" value="#{book.statusStr}" update=":info tStatus" actionListener="#{bookReqAction.changeStatus(book.bookID,book.status)}" rendered="#{bookAction.optAuth}"/>
+				<h:outputText value="#{book.statusStr}" rendered="#{!bookAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	
+	<!-- 查看页面 -->
+	<h:form id="showForm" >
+		<ui:include src="load/show.xhtml"/>
+	</h:form>
+	<!-- 添加/修改页面 -->
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="#{(bookReqAction.flag==0)?'添加':'修改'}" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="350">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{bookReqAction.flag}"/>
+					<h:inputHidden value="#{bookReqAction.updateObj.bookID }"/>
+					<p:commandButton value="#{bookReqAction.flag==0?'添加':'修改'}" actionListener="#{bookReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{bookReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	
+</h:body>
+</html>

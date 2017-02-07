@@ -1,0 +1,15 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="组织名称"/>
+	<p:outputLabel value="#{teacherOrgAction.showObj.orgName}"/>
+	
+	<h:outputLabel value="组织层次"/>
+	<p:outputLabel value="#{teacherOrgAction.showObj.level}"/>
+	
+	<h:outputLabel value="创建时间"/>
+	<p:outputLabel value="#{teacherOrgAction.showObj.createTimeStr}"/>
+	
+</p:panelGrid>

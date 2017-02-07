@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	>
+<h:head>
+	<title>章节</title>
+	<h:outputStylesheet name="page-css.css" library="css"/>
+	<h:outputScript name="page.js" library="js"/>
+</h:head>
+<h:body>
+	<p:growl for="info" id="info" life="3000" />
+	<h:form id="searchForm">
+	<p:panel id="dataTablePanel">
+		<p:fieldset legend="查询条件" toggleable="true" collapsed="true" widgetVar="searchFieldSet">
+		<p:panelGrid columns="4" style="width:100%; text-align:left;">
+
+			<h:outputLabel value="章节名称" />
+			<p:inputText value="#{chapterAction.search.chapterListName}" styleClass="minLength"/>
+
+			<h:outputLabel for="sStatus" value="章节策略" />
+			<p:selectOneMenu value="#{chapterAction.search.chapterListID}" style="width:200px;" panelStyleClass="minLength" >
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{chapterListOther.chapterListList}" var="cl" itemLabel="#{cl.chapterListName}" itemValue="#{cl.chapterListID}"/>
+			</p:selectOneMenu>
+
+			<h:outputLabel for="sStatus" value="状态" />
+			<p:selectOneMenu id="sStatus" value="#{chapterAction.search.status}" style="width:200px;" panelStyleClass="minLength">
+				<f:selectItem itemLabel="--请选择--" itemValue="" />
+				<f:selectItems value="#{chapterReqAction.status.entrySet()}" var="status" itemLabel="#{status.value}" itemValue="#{status.key}"/>
+			</p:selectOneMenu>
+
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:commandButton id="searchBtn" value="查询" oncomplete="searchFieldSet.toggle();" actionListener="#{chapterAction.search}" rendered="#{chapterAction.viewAuth}"/>
+					<p:spacer width="10px"/>
+					<p:commandButton type="reset" value="重置" />
+				</h:panelGroup>
+			</f:facet>
+		</p:panelGrid>
+		</p:fieldset>
+
+		<p:menubar>
+			<p:menuitem value="添加" icon="ui-icon-contact" oncomplete="addDialog.show();"
+				actionListener="#{chapterReqAction.add}" rendered="#{chapterAction.optAuth}" update=":addForm:addDialog" />
+		</p:menubar>
+
+		<p:dataTable scrollable="true" scrollHeight="#{chapterAction.heighti2}"
+			widgetVar="table"
+			id="list"
+			binding="#{chapterAction.pageTable}"
+			lazy="true"
+			value="#{chapterAction.page}"
+			rows="20"
+			var="chapter"
+			paginator="true"
+			paginatorPosition="bottom"
+			currentPageReportTemplate="{currentPage} of {totalPages} 共 {totalRecords}条记录"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="20,50"
+			rowIndexVar="row"
+			styleClass="gridTable"
+			emptyMessage="对不起，没有查询到数据！"
+			rendered="#{chapterAction.viewAuth}"
+			>
+			<p:column headerText="章节ID" width="10%">
+				<h:outputText value="#{chapter.chapterID}" />
+			</p:column>
+			<p:column headerText="章节名称" width="10%">
+				<h:outputText value="#{chapter.chapterName}" />
+			</p:column>
+			<p:column headerText="章节策略" width="20%">
+				<h:outputText value="#{chapter.chapterListName}" />
+			</p:column>
+			<p:column headerText="课程名称" width="25%">
+				<h:outputText value="#{chapter.courseName}" />
+			</p:column>
+			<p:column headerText="对外章节" width="10%">
+				<h:outputText value="第 #{chapter.outChapterID} 章"  rendered="#{not empty chapter.outChapterID}"/>
+			</p:column>
+			<p:column headerText="排序" width="10%">
+				<h:outputText value="#{chapter.sequence}" />
+			</p:column>
+			<p:column headerText="操作" width="15%">
+				<p:commandLink value="修改" oncomplete="loadDialog.show();" actionListener="#{chapterReqAction.update(chapter.chapterID)}" update=":loadForm:loadDialog" rendered="#{chapterAction.optAuth}"/>
+				<p:spacer width="10"/>
+				<p:commandLink value="设置高频考点信息" oncomplete="highFrequencyPointDialog.show();" actionListener="#{chapterReqAction.updateHighFrequency(chapter.chapterID)}" update=":highFrequencyPointForm:highFrequencyPointDialog" rendered="#{chapterAction.optAuth}"/>
+			</p:column>
+			<p:column headerText="状态" width="10%">
+				<p:commandLink id="tStatus" value="#{chapter.statusStr}" update=":info tStatus" actionListener="#{chapterReqAction.changeStatus(chapter.chapterID,chapter.status)}" rendered="#{chapterAction.optAuth}"/>
+				<h:outputText value="#{chapter.statusStr}" rendered="#{!chapterAction.optAuth}"/>
+			</p:column>
+		</p:dataTable>
+		<ui:include src="/page/common/blockUI.xhtml">
+			<ui:param name="tableID" value="list" />
+		</ui:include>
+	</p:panel>
+	</h:form>
+	<!-- 添加/修改页面 -->
+	<h:form id="addForm" >
+		<p:dialog id="addDialog" header="添加" widgetVar="addDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/add.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{chapterReqAction.flag}"/>
+					<p:commandButton value="添加" actionListener="#{chapterReqAction.updateSubmit}" update="msg" oncomplete="optResultAlert(args,'#{chapterReqAction.flag}','addcallBack');"/>
+					<p:commandButton type="button" value="关闭" onclick="addDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="loadForm" >
+		<p:dialog id="loadDialog" header="修改" widgetVar="loadDialog" resizable="false" showEffect="fade" hideEffect="fade" height="200">
+			<ui:include src="load/update.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{chapterReqAction.flag}"/>
+					<h:inputHidden value="#{chapterReqAction.updateObj.chapterID}"/>
+					<p:commandButton value="修改"
+					actionListener="#{chapterReqAction.updateSubmit}" update="msg" oncomplete="optResult('loadDialog',args,'#{chapterReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="loadDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<h:form id="highFrequencyPointForm" >
+		<p:dialog id="highFrequencyPointDialog" header="设置高频考点信息" widgetVar="highFrequencyPointDialog" resizable="false" showEffect="fade" hideEffect="fade" height="320">
+			<ui:include src="load/highFrequencyPoint.xhtml"/>
+			<f:facet name="footer">
+				<h:panelGroup style="display:block; text-align:center">
+					<p:messages id="msg"/>
+					<h:inputHidden value="#{chapterReqAction.flag}"/>
+					<h:inputHidden value="#{chapterReqAction.updateObjExtend.chapterID}"/>
+					<p:commandButton value="确认"
+					actionListener="#{chapterReqAction.updateHighFrequencyPointSubmint}" update="msg" oncomplete="optResult('highFrequencyPointDialog',args,'#{chapterReqAction.flag}');"/>
+					<p:commandButton type="button" value="关闭" onclick="highFrequencyPointDialog.hide();"/>
+				</h:panelGroup>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+	<script type="text/javascript">
+	function isValid(){
+		var outChapterID=$("#loadForm\\:outChapterID").val();
+		var filter = /^[1-9]{1}[0-9]{0,2}$/;
+		 if (filter.test(outChapterID)){
+			 alert('对外章节必须是大于1的数字,且不能超过3位！');
+			 return false;
+		 }else{
+			 return true;
+		 }
+	}
+	//添加form回调函数
+	function addcallBack(){
+		$("#addForm\\:chapterName").val("");
+		var outChapterID = $("#addForm\\:outChapterID").val();
+		if( outChapterID != "" &amp;&amp; outChapterID > 0 ){
+			outChapterID = parseInt(outChapterID)+1;
+		}
+		$("#addForm\\:outChapterID").val(outChapterID);
+		var sequence = $("#addForm\\:sequence").val();
+		if( sequence != "" &amp;&amp; sequence > 0 ){
+			sequence = parseInt(sequence)+1;
+		}
+		$("#addForm\\:sequence").val(sequence);
+	}
+	</script>
+</h:body>
+</html>

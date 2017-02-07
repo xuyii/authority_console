@@ -1,0 +1,17 @@
+<p:treeTable xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" value="#{privilegeModify.root}" var="document" >
+    
+    <p:column headerText="节点名称" style="width:50%">
+        <h:outputText value="#{document.privilegeName}" />
+    </p:column>
+    
+    <p:column headerText="操作" style="width:50%">
+        <p:selectManyCheckbox value="#{document.priCheckbox}" rendered="#{document.showCheckbox}">
+        	<f:selectItem itemLabel="查看" itemValue="#{document.privilegeID1}_view" itemDisabled="#{document.isDisable1}" />
+            <f:selectItem itemLabel="操作" itemValue="#{document.privilegeID2}_opt" itemDisabled="#{document.isDisable2}" />
+        </p:selectManyCheckbox>
+    </p:column>
+    
+</p:treeTable>

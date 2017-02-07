@@ -1,0 +1,30 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+	
+	<h:outputLabel value="ID"/>
+	<p:outputLabel value="#{privilegeAction.showObj.privilegeID}"/>
+	
+	<h:outputLabel value="名称"/>
+	<p:outputLabel value="#{privilegeAction.showObj.privilegeName}"/>
+	
+	<h:outputLabel value="描述"/>
+	<p:outputLabel value="#{privilegeAction.showObj.description}"/>
+	
+	<h:outputLabel value="排序优先级"/>
+	<p:outputLabel value="#{privilegeAction.showObj.sequence}"/>
+	
+	<h:outputLabel value="ActionURL"/>
+	<p:outputLabel value="#{privilegeAction.showObj.actionURLStr}"/>
+	
+	<h:outputLabel value="状态"/>
+	<p:outputLabel value="#{privilegeAction.showObj.showStatusStr}"/>
+	
+	<h:outputLabel value="创建者"/>
+	<p:outputLabel value="#{privilegeAction.showObj.creator}"/>
+	
+	<h:outputLabel value="创建时间"/>
+	<p:outputLabel value="#{privilegeAction.showObj.createTimeStr}"/>
+	
+</p:panelGrid>

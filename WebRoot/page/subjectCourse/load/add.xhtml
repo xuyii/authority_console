@@ -1,0 +1,56 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentMaxClass" >
+
+	<h:outputLabel value="主库辅导">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu value="#{subjectCourseReqAction.updateObj.courseEduID}" style="width:200px;" panelStyleClass="centerLength" filter="true" filterMatchMode="contains">
+		<p:ajax event="change" update="mEduSubjectID" listener="#{courseEduSubjectOther.changeCourseEduID2}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{courseEduOther.courseEduList2}" var="ce" itemLabel="(#{ce.courseEduID})#{ce.courseEduName}" itemValue="#{ce.courseEduID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="主库课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mEduSubjectID" value="#{subjectCourseReqAction.updateObj.eduSubjectID}" style="width:200px;" panelStyleClass="centerLength" filter="true" filterMatchMode="contains" >
+		<f:selectItems value="#{courseEduSubjectOther.courseEduSubjectList2}" var="c" itemLabel="(#{c.eduSubjectID})#{c.eduSubjectName}" itemValue="#{c.eduSubjectID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="所属网站">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mSiteID" value="#{subjectCourseReqAction.updateObj.siteID}" style="width:200px;" panelStyleClass="centerLength" >
+		<p:ajax event="change" update="mBusinessID mMajorID mCourseID" listener="#{businessOther.changeSiteID2}" />
+		<f:selectItems value="#{websiteOther.websiteList}" var="w" itemLabel="#{w.siteName}" itemValue="#{w.siteID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="所属专业">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mBusinessID" value="#{subjectCourseReqAction.updateObj.businessID}" style="width:200px;" panelStyleClass="centerLength" >
+		<p:ajax event="change" update="mMajorID mCourseID" listener="#{majorOther.changeBusinessID2}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{businessOther.businessList2}" var="b" itemLabel="#{b.businessName}" itemValue="#{b.businessID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="所属辅导">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneMenu id="mMajorID" value="#{subjectCourseReqAction.updateObj.majorID}" style="width:200px;" panelStyleClass="centerLength" >
+		<p:ajax event="change" update="mCourseID" listener="#{courseOther.changeMajorID2}" />
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{majorOther.majorList2}" var="m" itemLabel="#{m.majorName}" itemValue="#{m.majorID}"/>
+	</p:selectOneMenu>
+
+	<h:outputLabel value="所属课程">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectCheckboxMenu id="mCourseID" value="#{subjectCourseReqAction.courseIDs}" style="width:200px;" panelStyleClass="centerLength" >
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{courseOther.courseList2}" var="c" itemLabel="#{c.courseName}" itemValue="#{c.courseID}"/>
+	</p:selectCheckboxMenu>
+
+</p:panelGrid>

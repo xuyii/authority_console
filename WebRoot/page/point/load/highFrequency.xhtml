@@ -1,0 +1,12 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="highFrequencyPanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="是否是高频知识点"/>
+	<p:selectOneMenu value="#{pointReqAction.updateObjExtend.isHighFrequency}" style="width:200px;" panelStyleClass="minLength">
+		<f:selectItem itemLabel="--请选择--" itemValue="" />
+		<f:selectItems value="#{pointReqAction.isHighFrequency.entrySet()}" var="m" itemLabel="#{m.value}" itemValue="#{m.key}"/>
+	</p:selectOneMenu>
+
+</p:panelGrid>

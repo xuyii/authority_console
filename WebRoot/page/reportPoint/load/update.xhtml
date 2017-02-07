@@ -1,0 +1,32 @@
+<p:panelGrid xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" id="updatePanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+
+	<h:outputLabel value="知识点名称"/>
+	<h:outputText value="#{reportPointReqAction.updateObj.pointName}" />
+
+	<h:outputLabel value="题目总量">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<h:inputText value="#{reportPointReqAction.updateObj.quesCount}" />
+
+	<h:outputLabel value="总时长(分钟)">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<h:inputText value="#{reportPointReqAction.updateObj.pointLen}" />
+
+
+	<h:outputLabel value="是否参加考核">
+		<span class="requiredFlag">*</span>
+	</h:outputLabel>
+	<p:selectOneRadio panelStyleClass="minLength" value="#{reportPointReqAction.updateObj.isExamine}">
+		<f:selectItem itemLabel="是" itemValue="1" />
+		<f:selectItem itemLabel="否" itemValue="0" />
+	</p:selectOneRadio>
+
+
+
+	<h:inputHidden value="#{reportPointReqAction.updateObj.pointID}"/>
+	<h:inputHidden value="#{reportPointReqAction.updateObj.id}"/>
+</p:panelGrid>

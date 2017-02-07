@@ -1,0 +1,27 @@
+<p:dialog xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://java.sun.com/jsf/html"
+xmlns:f="http://java.sun.com/jsf/core"
+xmlns:p="http://primefaces.org/ui" id="showDialog" header="查看课程" widgetVar="showDialog" resizable="false" showEffect="fade" hideEffect="fade" height="350">
+	<p:panelGrid id="showPanelGrid" columns="2" columnClasses="addObjectClass, addContentClass" >
+		<h:outputLabel value="书本名称" />
+		<h:outputText value="#{bookReqAction.showObj.bookName}" />
+		<h:outputLabel value="书本链接" />
+		<h:outputText value="#{bookReqAction.showObj.httpLink}" />
+		<h:outputLabel value="使用的课程" />
+		<h:outputText value="#{bookReqAction.showObj.courseNames}" />
+		<h:outputLabel value="分页名称" />
+		<h:outputText value="#{bookReqAction.showObj.pageSubject}" />
+		<h:outputLabel value="题号名称" />
+		<h:outputText value="#{bookReqAction.showObj.quesSubject}" />
+		<h:outputLabel value="状态" />
+		<h:outputText value="#{bookReqAction.showObj.statusStr}" />
+		<h:outputLabel value="创建时间" />
+		<h:outputText value="#{bookReqAction.showObj.createTimeStr}" />
+	</p:panelGrid>
+	
+	<f:facet name="footer">
+		<h:panelGroup style="display:block; text-align:center">
+			<p:commandButton type="button" value="关闭" onclick="showDialog.hide();" />
+		</h:panelGroup>
+	</f:facet>
+</p:dialog>
